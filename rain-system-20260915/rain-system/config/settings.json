@@ -1,0 +1,4 @@
+{
+  "cwa_api_key": "",
+  "_說明": "cwa_api_key 填入氣象署開放資料平臺授權碼（CWA-XXXXXXXX-...），留空則暫停實測配對。locations 可覆寫地點座標，格式同 rain_pipeline/config.py。"
+}

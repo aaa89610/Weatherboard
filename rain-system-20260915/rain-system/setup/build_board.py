@@ -30,7 +30,7 @@ LOCS = [
     dict(name="新竹市", sub="北區",   tid="1001802", cid="10018", lat=24.8069, lon=120.9689,
          st=[("C0D66", "新竹市東區")]),
     dict(name="竹北市", sub="新竹縣", tid="1000401", cid="10004", lat=24.8387, lon=121.0070,
-         st=[("467571", "新竹(竹北)")]),
+         st=[("46757", "新竹")]),
 ]
 
 errors = []          # 取得失敗的來源，會顯示在看板上
@@ -208,11 +208,37 @@ def meteoblue(lat, lon):
             "pred": (p.group(1).replace("Predictability: ", "") if p else "")}
     return out
 
+# ---------------------------------------------------------------- 組裝
 
-# ---------------------------------------------------------------- 抓取
+def md(d):                       # date -> "MM/DD"
+    return d.strftime("%m/%d")
 
-def fetch_all():
-    """抓齊所有來源，回傳原始資料。失敗的來源記在 errors，不中斷。"""
+def risk_of(pop, qpf_mm, yr_mm, warned):
+    lvl = 0
+    if pop and pop >= 30 or yr_mm >= 0.3:
+        lvl = 1
+    if pop and pop >= 50 or qpf_mm >= 1 or yr_mm >= 2:
+        lvl = 2
+    if pop and pop >= 70 or qpf_mm >= 5 or yr_mm >= 6:
+        lvl = 3
+    if qpf_mm >= 15 or yr_mm >= 15:
+        lvl = 4
+    if warned and lvl < 2:
+        lvl = max(lvl, 1)
+    return lvl, ["低", "低–中", "中", "中–高", "高"][lvl]
+
+def main():
+    now = dt.datetime.now(TZ)
+    today, tomorrow = now.date(), now.date() + dt.timedelta(days=1)
+    stamp = now.strftime("%Y%m%dT%H%M")
+
+    prev = {}
+    try:
+        prev = json.load(open(os.path.join(ROOT, "data.json"), encoding="utf-8"))
+    except Exception:                      # noqa: BLE001
+        pass
+
+    # ---- 抓取
     warnings_raw, summary, c36, qpf, stations = [], {}, {}, {}, {}
     try: warnings_raw = cwa_warnings()
     except Exception as e: note_fail("氣象署特報", e)
@@ -239,44 +265,6 @@ def fetch_all():
         try: d["mb"] = meteoblue(L["lat"], L["lon"])
         except Exception as e: note_fail(f"meteoblue（{L['name']}）", e); d["mb"] = {}
         per[L["name"]] = d
-    return dict(warnings_raw=warnings_raw, summary=summary, c36=c36,
-                qpf=qpf, stations=stations, per=per)
-
-# ---------------------------------------------------------------- 組裝
-
-def md(d):                       # date -> "MM/DD"
-    return d.strftime("%m/%d")
-
-def risk_of(pop, qpf_mm, yr_mm, warned):
-    lvl = 0
-    if pop and pop >= 30 or yr_mm >= 0.3:
-        lvl = 1
-    if pop and pop >= 50 or qpf_mm >= 1 or yr_mm >= 2:
-        lvl = 2
-    if pop and pop >= 70 or qpf_mm >= 5 or yr_mm >= 6:
-        lvl = 3
-    if qpf_mm >= 15 or yr_mm >= 15:
-        lvl = 4
-    if warned and lvl < 2:
-        lvl = max(lvl, 1)
-    return lvl, ["低", "低–中", "中", "中–高", "高"][lvl]
-
-def main(raw=None, write_history=True):
-    now = dt.datetime.now(TZ)
-    today, tomorrow = now.date(), now.date() + dt.timedelta(days=1)
-    stamp = now.strftime("%Y%m%dT%H%M")
-
-    prev = {}
-    try:
-        prev = json.load(open(os.path.join(ROOT, "data.json"), encoding="utf-8"))
-    except Exception:                      # noqa: BLE001
-        pass
-
-    # ---- 抓取（--from-raw 時直接沿用 Actions 抓好的快照，不重抓）
-    if raw is None:
-        raw = fetch_all()
-    warnings_raw, summary, c36 = raw["warnings_raw"], raw["summary"], raw["c36"]
-    qpf, stations, per = raw["qpf"], raw["stations"], raw["per"]
 
     # ---- 特報
     warn_out, warned_area = [], set()
@@ -443,62 +431,20 @@ def main(raw=None, write_history=True):
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
 
-    if write_history:
-        os.makedirs(os.path.join(ROOT, "history"), exist_ok=True)
-        snap = {"run_time": now.isoformat(timespec="minutes"), "mode": data["mode"],
-                "stations": stations, "warnings": [w["title"] + "｜" + w["valid"] for w in warn_out],
-                "county36": c36, "summary": summary,
-                "qpf": {k: v for k, v in qpf.items()},
-                "yr": {L["name"]: per[L["name"]]["yr"] for L in LOCS},
-                "meteoblue": {L["name"]: per[L["name"]]["mb"] for L in LOCS},
-                "cwa_hourly": {L["name"]: per[L["name"]]["hourly"][:24] for L in LOCS},
-                "errors": errors}
-        with open(os.path.join(ROOT, "history", f"{stamp}.json"), "w", encoding="utf-8") as f:
-            json.dump(snap, f, ensure_ascii=False, indent=1)
+    os.makedirs(os.path.join(ROOT, "history"), exist_ok=True)
+    snap = {"run_time": now.isoformat(timespec="minutes"), "mode": data["mode"],
+            "stations": stations, "warnings": [w["title"] + "｜" + w["valid"] for w in warn_out],
+            "county36": c36, "summary": summary,
+            "qpf": {k: v for k, v in qpf.items()},
+            "yr": {L["name"]: per[L["name"]]["yr"] for L in LOCS},
+            "meteoblue": {L["name"]: per[L["name"]]["mb"] for L in LOCS},
+            "cwa_hourly": {L["name"]: per[L["name"]]["hourly"][:24] for L in LOCS},
+            "errors": errors}
+    with open(os.path.join(ROOT, "history", f"{stamp}.json"), "w", encoding="utf-8") as f:
+        json.dump(snap, f, ensure_ascii=False, indent=1)
 
     print("OK", data["updated"], "errors:", errors)
     return 0
 
-# ---------------------------------------------------------------- 兩段式執行
-
-RAW_KEYS = ("warnings_raw", "summary", "c36", "qpf", "stations", "per")
-
-def dump_raw():
-    """只抓取，把完整原始資料寫進 history/<stamp>.json。由 GitHub Actions 執行。
-
-    不做任何判讀，也不碰 data.json / index.html —— 那是判讀階段的事。
-    """
-    now = dt.datetime.now(TZ)
-    stamp = now.strftime("%Y%m%dT%H%M")
-    raw = fetch_all()
-
-    got = (raw["stations"] or raw["c36"] or raw["summary"]
-           or any(raw["per"][L["name"]]["hourly"] for L in LOCS))
-    if not got:
-        print("所有來源都失敗，不寫快照", errors, file=sys.stderr)
-        return 1
-
-    snap = {"run_time": now.isoformat(timespec="minutes"), "kind": "raw",
-            "errors": errors, "data": {k: raw[k] for k in RAW_KEYS}}
-    os.makedirs(os.path.join(ROOT, "history"), exist_ok=True)
-    path = os.path.join(ROOT, "history", f"{stamp}.json")
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(snap, f, ensure_ascii=False, indent=1)
-    print("RAW OK", stamp, "errors:", errors)
-    return 0
-
-def load_raw(path):
-    """讀回 dump_raw() 寫的快照，形狀與 fetch_all() 的回傳值相同。"""
-    snap = json.load(open(path, encoding="utf-8"))
-    if snap.get("kind") != "raw":
-        raise SystemExit(f"{path} 不是 --fetch-only 產生的原始快照")
-    errors.extend(snap.get("errors", []))
-    return snap["data"]
-
 if __name__ == "__main__":
-    if "--fetch-only" in sys.argv:
-        sys.exit(dump_raw())
-    if "--from-raw" in sys.argv:
-        src_path = sys.argv[sys.argv.index("--from-raw") + 1]
-        sys.exit(main(raw=load_raw(src_path), write_history=False))
     sys.exit(main())

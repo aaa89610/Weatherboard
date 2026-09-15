@@ -1,0 +1,243 @@
+<title>北部六地雨情看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#f3f6f9; --surface:#ffffff; --surface-2:#eaf0f5; --ink:#0f1e2b; --ink-2:#4a5d6d; --ink-3:#7a8b99;
+  --rule:#d5dee6; --accent:#1c5cab; --accent-ink:#ffffff;
+  --crit:#d03b3b; --serious:#ec835a; --warn:#fab219; --calm:#dde6ee; --calm-ink:#3d5163;
+  --h0:#edf2f6; --h1:#cde2fb; --h2:#9ec5f4; --h3:#5598e7; --h4:#2a78d6; --h5:#184f95;
+  --i0:var(--ink); --i1:var(--ink); --i2:var(--ink); --i3:#ffffff; --i4:#ffffff; --i5:#ffffff;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d151d; --surface:#131e28; --surface-2:#1a2733; --ink:#e4ecf2; --ink-2:#a3b4c2; --ink-3:#74879a;
+    --rule:#253544; --accent:#5598e7; --accent-ink:#0d151d;
+    --calm:#223242; --calm-ink:#b7c7d4;
+    --h0:#16212c; --h1:#1a3150; --h2:#1c4a86; --h3:#2a6cc4; --h4:#3987e5; --h5:#86b6ef;
+    --i0:#e4ecf2; --i1:#e4ecf2; --i2:#ffffff; --i3:#ffffff; --i4:#0d151d; --i5:#0d151d;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d151d; --surface:#131e28; --surface-2:#1a2733; --ink:#e4ecf2; --ink-2:#a3b4c2; --ink-3:#74879a;
+  --rule:#253544; --accent:#5598e7; --accent-ink:#0d151d;
+  --calm:#223242; --calm-ink:#b7c7d4;
+  --h0:#16212c; --h1:#1a3150; --h2:#1c4a86; --h3:#2a6cc4; --h4:#3987e5; --h5:#86b6ef;
+  --i0:#e4ecf2; --i1:#e4ecf2; --i2:#ffffff; --i3:#ffffff; --i4:#0d151d; --i5:#0d151d;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;padding-inline:clamp(16px,4vw,40px);padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase;font-family:var(--mono)}
+
+/* header */
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 32px;border-bottom:1px solid var(--rule);padding-bottom:20px}
+header h1{font-size:clamp(26px,3.4vw,36px);font-weight:900;letter-spacing:.02em}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-size:13px;color:var(--ink-2)}
+.meta b{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--calm);color:var(--calm-ink)}
+.chip.full::before,.chip.off::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.full{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.chip.off{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--ink)}
+
+.lede{font-size:clamp(17px,2vw,20px);font-weight:500;max-width:52ch;margin:0}
+
+/* warnings */
+.warns{display:flex;flex-direction:column;gap:8px}
+.warn{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;padding:12px 16px;background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--warn);border-radius:6px}
+.warn.critical{border-left-color:var(--crit)}
+.warn svg{width:20px;height:20px;margin-top:2px}
+.warn .t{font-weight:700}
+.warn .v{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);margin-left:8px;font-weight:400}
+.warn p{margin:0;color:var(--ink-2);font-size:14px}
+
+/* sections */
+section{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
+.sec-head h2{font-size:20px;font-weight:700}
+.sec-head .note{font-size:13px;color:var(--ink-3)}
+
+/* location cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card h3{font-size:19px;font-weight:700;line-height:1.3}
+.card h3 small{display:block;font-size:12px;font-weight:400;color:var(--ink-3);letter-spacing:.04em}
+.risk{flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:13px;font-weight:700;white-space:nowrap}
+.risk i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+.r0{background:var(--calm);color:var(--calm-ink)}
+.r1{background:var(--calm);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--warn)}
+.r2{background:var(--warn);color:#241a00}
+.r3{background:var(--serious);color:#2a1206}
+.r4{background:var(--crit);color:#fff}
+.now{font-size:14px;color:var(--ink-2);margin:0}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid var(--rule);padding-top:12px}
+.kv div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kv dt{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em}
+.kv dd{margin:0;font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.kv dd small{font-size:12px;font-weight:400;color:var(--ink-3);margin-left:2px}
+.umb{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px}
+.umb span{color:var(--ink-3)}
+.umb b{font-weight:500}
+
+/* heat table */
+.table-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:8px}
+table.heat{border-collapse:separate;border-spacing:3px;width:100%;min-width:760px;padding:8px}
+.heat th{font-weight:500;font-size:12.5px;color:var(--ink-2);padding:6px 8px;text-align:center;white-space:nowrap}
+.heat th .d{display:block;font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600}
+.heat th.loc{text-align:left;font-size:14px;color:var(--ink);font-weight:700;padding-right:14px}
+.heat td{border-radius:4px;padding:8px 6px 7px;text-align:center;vertical-align:top;min-width:86px}
+.heat td:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.heat .mm{font-family:var(--mono);font-size:18px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.heat .mm small{font-size:11px;font-weight:400;opacity:.8}
+.heat .sub{font-size:11.5px;line-height:1.45;opacity:.85}
+.heat .sub .wx{display:block;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:12.5px;color:var(--ink-2)}
+.legend .sw{display:inline-flex;align-items:center;gap:5px}
+.legend .sw i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--rule)}
+
+/* lower grid */
+.split{display:grid;grid-template-columns:1.35fr 1fr;gap:24px}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.list li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.list li:first-child{padding-top:0}
+.list .when{font-weight:700}
+.list .where{color:var(--ink-2);font-size:13.5px;margin-left:6px;font-weight:400}
+.list .detail{grid-column:1/-1;font-size:13.5px;color:var(--ink-2)}
+.agree{font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;align-self:start;white-space:nowrap}
+.agree.a-high{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.agree.a-mid{background:var(--calm);color:var(--calm-ink)}
+.agree.a-low{background:transparent;color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--rule)}
+.peak{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.peak .big{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1.1}
+.peak .big span{font-family:var(--sans);font-size:15px;font-weight:700;margin-left:10px}
+.peak p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.changes{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+.side{display:flex;flex-direction:column;gap:20px}
+.side h3{font-size:15px;font-weight:700;margin-bottom:8px}
+
+footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink-2)}
+.srcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px 24px}
+.srcs div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding:4px 0}
+.srcs .mono{color:var(--ink);font-size:12.5px;white-space:nowrap}
+footer p{margin:0;max-width:80ch}
+@media (max-width:420px){.kv dd{font-size:16px}.card{padding:14px}}
+@media (prefers-reduced-motion:no-preference){.card,.warn{transition:border-color .15s}.card:hover{border-color:var(--ink-3)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Northern Taiwan · 6 points · rain</div>
+      <h1>北部六地雨情看板</h1>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <p class="lede" id="lede"></p>
+  <div class="warns" id="warns"></div>
+
+  <section aria-labelledby="h-now">
+    <div class="sec-head"><h2 id="h-now">接下來 6 小時</h2><span class="note">風險依降雨機率、定量降水預報與即時雨量綜合判斷</span></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section aria-labelledby="h-week">
+    <div class="sec-head"><h2 id="h-week">未來 7 天逐日雨量</h2><span class="note">色塊與大字＝yr.no 日雨量（mm）；小字＝meteoblue 區間／氣象署機率與天氣</span></div>
+    <div class="table-scroll"><table class="heat" id="heat"></table></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <div class="split">
+    <section aria-labelledby="h-notable">
+      <div class="sec-head"><h2 id="h-notable">雨勢較明顯的日期</h2><span class="note">標籤為各來源的一致程度</span></div>
+      <ul class="list" id="notable"></ul>
+    </section>
+    <div class="side">
+      <section aria-labelledby="h-peak">
+        <div class="sec-head"><h2 id="h-peak">預估雨量最高</h2></div>
+        <div class="peak" id="peak"></div>
+      </section>
+      <section aria-labelledby="h-chg">
+        <h3 id="h-chg">與上次更新相比</h3>
+        <ul class="changes" id="changes"></ul>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <div class="srcs" id="srcs"></div>
+    <p id="unc"></p>
+    <p>每天 07:00–21:00 每 2 小時更新。電腦離線時改用雲端讀取，部分項目（定量降水預報、雨量站累積）會暫缺並標示「離線模式」。</p>
+  </footer>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const WD = '日一二三四五六';
+
+  $('meta').innerHTML =
+    `<span>更新 <b>${esc(D.updated.slice(5).replace('-','/'))}</b></span>` +
+    `<span>下次 <b>${esc(D.next)}</b></span>` +
+    `<span class="chip ${D.mode === '完整' ? 'full' : 'off'}">${D.mode === '完整' ? '完整資料' : '離線模式'}</span>`;
+  $('lede').textContent = D.headline;
+
+  const icon = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5 18.5 17h-17z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1" fill="currentColor"/></svg>';
+  $('warns').innerHTML = (D.warnings || []).map(w =>
+    `<div class="warn ${esc(w.level)}" role="note">${icon}<div><div class="t">${esc(w.title)}<span class="v">${esc(w.valid)}</span></div><p>${esc(w.text)}</p></div></div>`).join('');
+
+  $('cards').innerHTML = D.locations.map(l => `
+    <article class="card">
+      <div class="card-top">
+        <h3>${esc(l.name)}<small>${esc(l.sub)}</small></h3>
+        <span class="risk r${Math.min(4, l.level)}"><i></i>風險 ${esc(l.risk)}</span>
+      </div>
+      <p class="now">${esc(l.now)}</p>
+      <div class="umb"><div><span>帶傘</span> <b>${esc(l.umbrella)}</b></div><div><span>降雨機率</span> <b>${esc(l.pop)}</b></div></div>
+      <dl class="kv">
+        <div><dt>過去 1 小時</dt><dd>${Number(l.rain1h).toFixed(1)}<small>mm</small></dd></div>
+        <div><dt>今日累積</dt><dd title="${esc(l.todayNote)}">${Number(l.today).toFixed(1)}<small>mm</small></dd></div>
+        <div><dt>今日剩餘</dt><dd>${esc(l.remaining)}<small>mm</small></dd></div>
+      </dl>
+    </article>`).join('');
+
+  const bins = [[0.1,'h0','< 0.1'],[1,'h1','0.1–1'],[5,'h2','1–5'],[10,'h3','5–10'],[20,'h4','10–20'],[Infinity,'h5','≥ 20']];
+  const bin = v => bins.find(b => v < b[0]);
+  const days = D.days.map(s => { const [y,m,d] = s.split('-').map(Number); const w = new Date(Date.UTC(y,m-1,d)).getUTCDay(); return {m, d, w}; });
+  let html = '<thead><tr><th class="loc" scope="col">地點</th>' + days.map(d =>
+    `<th scope="col"><span class="d">${d.m}/${d.d}</span>週${WD[d.w]}</th>`).join('') + '</tr></thead><tbody>';
+  for (const [loc, cells] of Object.entries(D.matrix)) {
+    html += `<tr><th class="loc" scope="row">${esc(loc)}</th>` + cells.map((c, i) => {
+      const b = bin(c.yr);
+      const tip = `${loc} ${days[i].m}/${days[i].d}：yr ${c.yr} mm；meteoblue ${c.mb} mm；氣象署 ${c.cwa || '（未提供機率）'} ${c.wx}`;
+      return `<td tabindex="0" title="${esc(tip)}" style="background:var(--${b[1]});color:var(--i${b[1].slice(1)})">
+        <div class="mm">${c.yr.toFixed(1)}</div>
+        <div class="sub">mb ${esc(c.mb)}<span class="wx">${c.cwa ? esc(c.cwa) + ' · ' : ''}${esc(c.wx)}</span></div></td>`;
+    }).join('') + '</tr>';
+  }
+  $('heat').innerHTML = html + '</tbody>';
+  $('legend').innerHTML = '<span>yr 日雨量</span>' + bins.map(b => `<span class="sw"><i style="background:var(--${b[1]})"></i>${b[2]}</span>`).join('') + '<span>mm</span>';
+
+  const agreeCls = a => a.startsWith('高') ? 'a-high' : a.startsWith('中') ? 'a-mid' : 'a-low';
+  $('notable').innerHTML = D.notable.map(n =>
+    `<li><div class="when">${esc(n.when)}<span class="where">${esc(n.where)}</span></div><span class="agree ${agreeCls(n.agree)}">一致度 ${esc(n.agree)}</span><div class="detail">${esc(n.detail)}</div></li>`).join('');
+  const p = D.peak;
+  $('peak').innerHTML = `<div class="big">${esc(p.value)}<span>${esc(p.where)} ${esc(p.when)}</span></div><p>${esc(p.note)}</p>`;
+  $('changes').innerHTML = D.changes.map(c => `<li>${esc(c)}</li>`).join('');
+  $('srcs').innerHTML = D.sources.map(s => `<div><span>${esc(s[0])}</span><span class="mono">${esc(s[1])}</span></div>`).join('');
+  $('unc').textContent = '第 5–7 天不確定性：' + D.uncertainty;
+})();
+</script>
