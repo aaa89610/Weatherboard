@@ -6,33 +6,48 @@
 
 ## 架構
 
-資料收集與判讀都由 Claude 做，GitHub 只負責把產出的 HTML 發布成網頁。
+raw data 落進 `data/`，Claude 讀整個資料夾做空間分析與判讀，產生 HTML 報告覆蓋 Pages 檔案。
 
 ```
-Claude Routine（每 2 小時，台灣時間 07–21）
-  → 網頁搜尋收集各地雨情與特報
-  → 跨來源比對、標出分歧、做出判讀
-  → 寫成 report.html
+抓取（runner，網路不受限）
+  → data/v2/<stamp>.json      固定 schema：rain-snapshot/2
+       ↓
+Claude Routine（每 2 小時）
+  → analyze/load.py           讀 data/ 全部內容，整理跨時間摘要
+  → spatial/spatial.py        環域 / 地形分離 / 雨帶追蹤
+  → 判讀（人／模型做，不寫成閾值）
+  → report.json → analyze/render.py → report.html
   → git push main
        ↓
-GitHub Actions  deploy.yml（report.html 等檔案變動才動）
+GitHub Actions  deploy.yml
   → 發布到 GitHub Pages
 ```
 
-兩端都在雲端，不需要開著自己的電腦。GitHub 端沒有任何排程。
+判讀與版型分離：`report.json` 只放判讀結果，CSS 與結構固定在 `analyze/render.py`，
+每次更新不必重寫版面。
 
-## 檔案
+## 目錄
 
 | 路徑 | 說明 |
 | --- | --- |
-| `index.html` | 產生出來的看板首頁（GitHub Pages 根目錄） |
-| `template.html` | 版面樣板，`__DATA__` 會被換成當次資料 |
-| `data.json` | 當次資料 |
-| `history/YYYYMMDDTHHMM.json` | 每次執行的原始快照 |
-| `report.html` | Claude 產生的判讀報告（每次更新覆蓋） |
-| `build_board.py` | 直連氣象署端點的細粒度抓取程式，目前僅手動使用 |
-| `.github/workflows/fetch.yml` | 手動觸發才跑，產生細粒度原始快照 |
-| `.github/workflows/deploy.yml` | 檔案變動時部署到 Pages |
+| `data/v2/` | 固定 schema 快照，可跨時間比較 |
+| `data/raw/` | 舊格式快照 22 筆（09/11–09/15），每筆 schema 不同，僅供淺層參考 |
+| `spatial/` | 47 站表與空間分析模組（純函式：envelope／summarize／terrain_split／track） |
+| `analyze/load.py` | 讀 `data/` 全部內容，輸出跨時間摘要 |
+| `analyze/render.py` | `report.json` → `report.html` |
+| `report.json` | 本次判讀結果 |
+| `report.html` | 部署到 Pages 的報告 |
+| `rain-system-20260915/` | 前一代系統完整備份，含 `UPDATE_PROCEDURE.md` |
+
+## 空間分析的三道守門
+
+| 函式 | 守門條件 |
+| --- | --- |
+| `summarize` / `verdict` | 代表站 0 但環域有雨時，必須寫成「局部有雨、站點漏接」，不可寫 0 |
+| `terrain_split` | 判定「完全分離」或「≥3 倍」時，平地預報值視為**上限**而非期望值 |
+| `track` | 雨區縮小超過 40% 時回 `unusable`，拒絕給移動方向 |
+
+第二道的由來：09/14 夜間模式給台北平地約 13 mm、官方發大雨特報，實際平地 0.0 mm，雨全落在山區。
 
 ## 更新時間
 
