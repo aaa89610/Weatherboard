@@ -1,0 +1,46 @@
+name: 抓取原始資料
+
+# GitHub 只負責「抓」,不做判讀。抓完把原始快照寫進 history/ 就結束;
+# 判讀、產生看板、部署由 Claude Routine 在快照 push 之後接手。
+on:
+  schedule:
+    # 台灣時間 07,09,11,13,15,17,19,21 → UTC 23,01,03,05,07,09,11,13
+    - cron: '5 23,1,3,5,7,9,11,13 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安裝套件
+        run: pip install --quiet requests pillow
+
+      # 全部來源都失敗時會回非 0,job 直接紅燈,不會寫出空快照
+      - name: 抓取原始資料
+        run: python build_board.py --fetch-only
+
+      - name: 提交原始快照
+        run: |
+          git config user.name  "Weatherboard Bot"
+          git config user.email "aaa89610@users.noreply.github.com"
+          git add history
+          if git diff --cached --quiet; then
+            echo "無新快照,略過 commit"
+          else
+            git commit -m "原始快照 $(TZ=Asia/Taipei date '+%Y-%m-%d %H:%M')"
+            git push || (git pull --rebase && git push)
+          fi
