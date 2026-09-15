@@ -1,0 +1,243 @@
+<title>北部六地雨情看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#f3f6f9; --surface:#ffffff; --surface-2:#eaf0f5; --ink:#0f1e2b; --ink-2:#4a5d6d; --ink-3:#7a8b99;
+  --rule:#d5dee6; --accent:#1c5cab; --accent-ink:#ffffff;
+  --crit:#d03b3b; --serious:#ec835a; --warn:#fab219; --calm:#dde6ee; --calm-ink:#3d5163;
+  --h0:#edf2f6; --h1:#cde2fb; --h2:#9ec5f4; --h3:#5598e7; --h4:#2a78d6; --h5:#184f95;
+  --i0:var(--ink); --i1:var(--ink); --i2:var(--ink); --i3:#ffffff; --i4:#ffffff; --i5:#ffffff;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d151d; --surface:#131e28; --surface-2:#1a2733; --ink:#e4ecf2; --ink-2:#a3b4c2; --ink-3:#74879a;
+    --rule:#253544; --accent:#5598e7; --accent-ink:#0d151d;
+    --calm:#223242; --calm-ink:#b7c7d4;
+    --h0:#16212c; --h1:#1a3150; --h2:#1c4a86; --h3:#2a6cc4; --h4:#3987e5; --h5:#86b6ef;
+    --i0:#e4ecf2; --i1:#e4ecf2; --i2:#ffffff; --i3:#ffffff; --i4:#0d151d; --i5:#0d151d;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d151d; --surface:#131e28; --surface-2:#1a2733; --ink:#e4ecf2; --ink-2:#a3b4c2; --ink-3:#74879a;
+  --rule:#253544; --accent:#5598e7; --accent-ink:#0d151d;
+  --calm:#223242; --calm-ink:#b7c7d4;
+  --h0:#16212c; --h1:#1a3150; --h2:#1c4a86; --h3:#2a6cc4; --h4:#3987e5; --h5:#86b6ef;
+  --i0:#e4ecf2; --i1:#e4ecf2; --i2:#ffffff; --i3:#ffffff; --i4:#0d151d; --i5:#0d151d;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;padding-inline:clamp(16px,4vw,40px);padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase;font-family:var(--mono)}
+
+/* header */
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 32px;border-bottom:1px solid var(--rule);padding-bottom:20px}
+header h1{font-size:clamp(26px,3.4vw,36px);font-weight:900;letter-spacing:.02em}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-size:13px;color:var(--ink-2)}
+.meta b{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--calm);color:var(--calm-ink)}
+.chip.full::before,.chip.off::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.full{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.chip.off{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--ink)}
+
+.lede{font-size:clamp(17px,2vw,20px);font-weight:500;max-width:52ch;margin:0}
+
+/* warnings */
+.warns{display:flex;flex-direction:column;gap:8px}
+.warn{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;padding:12px 16px;background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--warn);border-radius:6px}
+.warn.critical{border-left-color:var(--crit)}
+.warn svg{width:20px;height:20px;margin-top:2px}
+.warn .t{font-weight:700}
+.warn .v{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);margin-left:8px;font-weight:400}
+.warn p{margin:0;color:var(--ink-2);font-size:14px}
+
+/* sections */
+section{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
+.sec-head h2{font-size:20px;font-weight:700}
+.sec-head .note{font-size:13px;color:var(--ink-3)}
+
+/* location cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card h3{font-size:19px;font-weight:700;line-height:1.3}
+.card h3 small{display:block;font-size:12px;font-weight:400;color:var(--ink-3);letter-spacing:.04em}
+.risk{flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:13px;font-weight:700;white-space:nowrap}
+.risk i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+.r0{background:var(--calm);color:var(--calm-ink)}
+.r1{background:var(--calm);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--warn)}
+.r2{background:var(--warn);color:#241a00}
+.r3{background:var(--serious);color:#2a1206}
+.r4{background:var(--crit);color:#fff}
+.now{font-size:14px;color:var(--ink-2);margin:0}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid var(--rule);padding-top:12px}
+.kv div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kv dt{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em}
+.kv dd{margin:0;font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.kv dd small{font-size:12px;font-weight:400;color:var(--ink-3);margin-left:2px}
+.umb{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px}
+.umb span{color:var(--ink-3)}
+.umb b{font-weight:500}
+
+/* heat table */
+.table-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:8px}
+table.heat{border-collapse:separate;border-spacing:3px;width:100%;min-width:760px;padding:8px}
+.heat th{font-weight:500;font-size:12.5px;color:var(--ink-2);padding:6px 8px;text-align:center;white-space:nowrap}
+.heat th .d{display:block;font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600}
+.heat th.loc{text-align:left;font-size:14px;color:var(--ink);font-weight:700;padding-right:14px}
+.heat td{border-radius:4px;padding:8px 6px 7px;text-align:center;vertical-align:top;min-width:86px}
+.heat td:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.heat .mm{font-family:var(--mono);font-size:18px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.heat .mm small{font-size:11px;font-weight:400;opacity:.8}
+.heat .sub{font-size:11.5px;line-height:1.45;opacity:.85}
+.heat .sub .wx{display:block;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:12.5px;color:var(--ink-2)}
+.legend .sw{display:inline-flex;align-items:center;gap:5px}
+.legend .sw i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--rule)}
+
+/* lower grid */
+.split{display:grid;grid-template-columns:1.35fr 1fr;gap:24px}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.list li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.list li:first-child{padding-top:0}
+.list .when{font-weight:700}
+.list .where{color:var(--ink-2);font-size:13.5px;margin-left:6px;font-weight:400}
+.list .detail{grid-column:1/-1;font-size:13.5px;color:var(--ink-2)}
+.agree{font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;align-self:start;white-space:nowrap}
+.agree.a-high{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.agree.a-mid{background:var(--calm);color:var(--calm-ink)}
+.agree.a-low{background:transparent;color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--rule)}
+.peak{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.peak .big{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1.1}
+.peak .big span{font-family:var(--sans);font-size:15px;font-weight:700;margin-left:10px}
+.peak p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.changes{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+.side{display:flex;flex-direction:column;gap:20px}
+.side h3{font-size:15px;font-weight:700;margin-bottom:8px}
+
+footer{border-top:1px solid var(--rule);padding-top:18px;display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink-2)}
+.srcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px 24px}
+.srcs div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding:4px 0}
+.srcs .mono{color:var(--ink);font-size:12.5px;white-space:nowrap}
+footer p{margin:0;max-width:80ch}
+@media (max-width:420px){.kv dd{font-size:16px}.card{padding:14px}}
+@media (prefers-reduced-motion:no-preference){.card,.warn{transition:border-color .15s}.card:hover{border-color:var(--ink-3)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Northern Taiwan · 7 points · rain</div>
+      <h1>北部七地雨情看板</h1>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <p class="lede" id="lede"></p>
+  <div class="warns" id="warns"></div>
+
+  <section aria-labelledby="h-now">
+    <div class="sec-head"><h2 id="h-now">接下來 6 小時</h2><span class="note">風險依降雨機率、定量降水預報與即時雨量綜合判斷</span></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section aria-labelledby="h-week">
+    <div class="sec-head"><h2 id="h-week">未來 7 天逐日雨量</h2><span class="note">色塊與大字＝yr.no 日雨量（mm）；小字＝meteoblue 區間／氣象署機率與天氣</span></div>
+    <div class="table-scroll"><table class="heat" id="heat"></table></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <div class="split">
+    <section aria-labelledby="h-notable">
+      <div class="sec-head"><h2 id="h-notable">雨勢較明顯的日期</h2><span class="note">標籤為各來源的一致程度</span></div>
+      <ul class="list" id="notable"></ul>
+    </section>
+    <div class="side">
+      <section aria-labelledby="h-peak">
+        <div class="sec-head"><h2 id="h-peak">預估雨量最高</h2></div>
+        <div class="peak" id="peak"></div>
+      </section>
+      <section aria-labelledby="h-chg">
+        <h3 id="h-chg">與上次更新相比</h3>
+        <ul class="changes" id="changes"></ul>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <div class="srcs" id="srcs"></div>
+    <p id="unc"></p>
+    <p>每天 07:00–21:00 每 2 小時更新。電腦離線時改用雲端讀取，部分項目（定量降水預報、雨量站累積）會暫缺並標示「離線模式」。</p>
+  </footer>
+</div>
+
+<script id="data" type="application/json">{"updated": "2026-09-15 11:00", "next": "09/15 16:00", "mode": "雲端＋API", "headline": "官方把大雨特報的範圍改成「新北山區」了——這正是實測顯示的樣子：10:50 山區中位數 3.75 mm（桶後 9.5、擎天崗 7.0、石碇 6.0），七地平地全部 0.0。今天剩下的只有午後 12–14 時一小段，台北約 2.5 mm，其餘六地不到 1 mm。", "warnings": [{"level": "warning", "title": "大雨特報（範圍已限縮到山區）", "valid": "09/15 09:40 → 09/15 23:00", "text": "東北季風影響及對流雲系發展旺盛，易有短延時強降雨，今日東北部地區及新北山區有局部大雨機率。昨晚那則寫「大臺北」，今早這則改成「新北山區」——與實測的地形分離一致，平地不在範圍內。"}, {"level": "warning", "title": "陸上強風特報（已延長）", "valid": "09/15 10:27 → 09/16 23:00", "text": "東北風偏強，桃園市、新竹市、新竹縣、苗栗縣等地局部平均風 6 級以上或陣風 8 級以上。新竹、竹北今明兩天的主角都是風。"}], "locations": [{"name": "台北市", "sub": "信義區", "risk": "低", "level": 1, "now": "代表站信義 0.0；環域 7/11 站有雨，最大 1.0 mm（文山）", "rain1h": 0.0, "today": 0.0, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "2.5（12–15 時）", "umbrella": "12–14 時帶傘", "pop": "12–14 時 30%，其餘 20%"}, {"name": "板橋區", "sub": "新北市", "risk": "低", "level": 0, "now": "代表站板橋 0.0；環域 6/12 站有雨，最大 2.5 mm（新店）", "rain1h": 0.0, "today": 0.0, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "0.6", "umbrella": "午後看天色", "pop": "午後 30%"}, {"name": "中和區", "sub": "新北市", "risk": "低", "level": 0, "now": "代表站中和 0.0；環域 8/14 站有雨，最大 2.5 mm", "rain1h": 0.0, "today": 0.0, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "0.6", "umbrella": "午後看天色", "pop": "午後 30%"}, {"name": "土城區", "sub": "新北市", "risk": "低", "level": 0, "now": "代表站土城 0.5 mm；環域 4/8 站有雨，最大 2.5 mm（新店）", "rain1h": 0.0, "today": 0.5, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "0.3", "umbrella": "午後看天色", "pop": "午後 30%"}, {"name": "樹林區", "sub": "新北市", "risk": "低", "level": 0, "now": "代表站山佳 0.0；環域 3/8 站有雨，最大 1.0 mm（三峽）", "rain1h": 0.0, "today": 0.0, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "0.3", "umbrella": "不需要", "pop": "午後 30%"}, {"name": "新竹市", "sub": "北區", "risk": "低", "level": 0, "now": "環域 4 站全 0", "rain1h": 0.0, "today": 0.0, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "0", "umbrella": "不需要；風大到明晚", "pop": "20%"}, {"name": "竹北市", "sub": "新竹縣", "risk": "低", "level": 0, "now": "環域 4 站全 0（竹北站 467571 已納入）", "rain1h": 0.0, "today": 0.0, "todayNote": "氣象署 API 雨量站 10:50 觀測（延遲 10 分鐘）", "remaining": "0", "umbrella": "不需要；風大到明晚", "pop": "20%"}], "days": ["2026-09-15", "2026-09-16", "2026-09-17", "2026-09-18", "2026-09-19", "2026-09-20", "2026-09-21"], "matrix": {"台北市": [{"yr": 2.5, "mb": "0–2", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.2, "mb": "0–2", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 1.3, "mb": "0–2", "cwa": "30%", "wx": "09–15 時短暫陣雨 30%"}, {"yr": 1.4, "mb": "0–2", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.1, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 1.3, "mb": "5–10", "cwa": "", "wx": "白天短暫陣雨"}, {"yr": 0.5, "mb": "—", "cwa": "", "wx": "—"}], "板橋區": [{"yr": 0.6, "mb": "0–5", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 0.2, "mb": "—", "cwa": "30%", "wx": "09–15 時短暫陣雨 30%"}, {"yr": 0.3, "mb": "0–2", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.1, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 1.8, "mb": "5–10", "cwa": "", "wx": "白天短暫陣雨"}, {"yr": 0.4, "mb": "—", "cwa": "", "wx": "—"}], "中和區": [{"yr": 0.6, "mb": "10–20", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 0.2, "mb": "0–5", "cwa": "30%", "wx": "09–15 時短暫陣雨 30%"}, {"yr": 0.3, "mb": "0–2", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.1, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 1.8, "mb": "5–10", "cwa": "", "wx": "白天短暫陣雨"}, {"yr": 0.4, "mb": "—", "cwa": "", "wx": "—"}], "土城區": [{"yr": 0.3, "mb": "10–20", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.0, "mb": "0–2", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 0.2, "mb": "0–5", "cwa": "30%", "wx": "09–15 時短暫陣雨 30%"}, {"yr": 0.3, "mb": "0–5", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.3, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 3.0, "mb": "5–10", "cwa": "", "wx": "白天短暫陣雨"}, {"yr": 0.6, "mb": "—", "cwa": "", "wx": "—"}], "樹林區": [{"yr": 0.3, "mb": "—", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 0.2, "mb": "—", "cwa": "30%", "wx": "09–15 時短暫陣雨 30%"}, {"yr": 0.3, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.3, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 3.0, "mb": "—", "cwa": "", "wx": "白天短暫陣雨"}, {"yr": 0.6, "mb": "—", "cwa": "", "wx": "—"}], "新竹市": [{"yr": 0.6, "mb": "—", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "多雲"}, {"yr": 0.2, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.2, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.7, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.0, "mb": "—", "cwa": "", "wx": "—"}], "竹北市": [{"yr": 0.6, "mb": "—", "cwa": "30%", "wx": "12–14 時短暫陣雨"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "陰天，零星"}, {"yr": 0.0, "mb": "—", "cwa": "20%", "wx": "多雲"}, {"yr": 0.2, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.2, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.7, "mb": "—", "cwa": "", "wx": "晴時多雲"}, {"yr": 0.0, "mb": "—", "cwa": "", "wx": "—"}]}, "notable": [{"when": "今天 12–14 時", "where": "台北市", "detail": "yr 12 時 1.1、13 時 0.7、14 時 0.4 mm，氣象署同時段 30%。今天只剩這一段，15 時後降到 20%。板橋 0.6、樹林 0.3 mm，更小", "agree": "中"}, {"when": "今天整天", "where": "新北山區", "detail": "大雨特報範圍。10:50 本日累積：桶後 9.5、擎天崗 7.0、石碇 6.0、鞍部 4.5、拉拉山 4.5、陽明山 4.0、貓空 3.5 mm。若你要進山區（烏來、坪林、石碇），這跟平地是兩回事", "agree": "實測"}, {"when": "9/17（四）白天", "where": "雙北五地", "detail": "時間落後集合：yr 對這天的三次預報 0.8 → 1.0 → 1.3 mm，離散只有 1.6 倍且穩定向上；氣象署 09–15 時 30%。目前 7 天內最可信的一波", "agree": "中"}, {"when": "9/20（日）", "where": "雙北五地", "detail": "yr 三次預報 2.2 → 2.2 → 1.3 mm（離散 1.7 倍），土城／樹林 3.0 mm。距今 5 天，只能當趨勢", "agree": "中"}], "peak": {"value": "約 2.5 mm", "where": "台北市（平地）", "when": "今天 12 時 → 15 時", "note": "山區另計：桶後今日已 9.5 mm，且特報仍在效期內。平地與山區今天差距超過 10 倍，不要用同一個數字概括"}, "changes": ["★ 官方特報範圍從「大臺北」改成「新北山區」（09:40 重發）——與我的地形分離判定一致。昨晚我照模式寫平地 13 mm 的錯誤，今天官方自己也修正了方向", "本次起改用環域站群報實測：板橋站雖然 0.0，但環域 6/12 站有雨（新店 2.5 mm）。舊寫法會只寫「0」", "首次啟用時間落後集合。yr 對「今天台北」的 5 次預報是 11.9 → 7.3 → 12.8 → 12.8 → 2.5，離散 5.1 倍；板橋 8.8 → 0.5 → 0.6（17.6 倍）、樹林 6.3 → 0.1 → 0.3（63 倍）。昨晚我報單一值 13 mm，等於把這個離散度整個藏起來", "竹北測站 467571 正式納入（站就在竹北市），不再只靠預報推估", "強風特報延長到 09/16 23:00", "今天平地實測 0.0 至 10:50，昨夜「大雨特報」在平地完全落空已確認"], "sources": [["氣象署 API 雨量站（36 站）", "09/15 10:50 觀測，延遲 10 分"], ["氣象署大雨特報", "09/15 09:40 發布"], ["氣象署陸上強風特報", "09/15 10:27"], ["氣象署鄉鎮逐時預報", "09/15 11:08 讀取"], ["yr.no（ECMWF）", "09/15 10:15 更新"], ["時間落後集合（自建）", "5 個發布時刻"], ["7Timer!（GFS）", "init 09/14 12Z"], ["meteoblue（多模式）", "09/13 21:00 讀取"]], "uncertainty": "本次起改用時間落後集合量化不確定性，第一批結果就說明了問題：yr 對「今天台北」的五次預報離散 5.1 倍（2.5–12.8 mm），板橋 17.6 倍，樹林 63 倍。昨晚我報「約 13 mm」時，那個離散度已經存在，只是沒被計算出來。往後只要離散超過 3 倍，我會直接寫區間而不是點值。反過來看，9/17 的離散只有 1.6 倍且三次穩定向上，那才是可信的訊號。第 5–7 天（9/19–9/21）目前成員數不足（每天只有 1–3 次預報），還不足以給區間，暫時只講有無訊號。校正狀態「校正待驗證」——樣本 3 筆，其中 1 筆明確失敗。"}</script>
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const WD = '日一二三四五六';
+
+  $('meta').innerHTML =
+    `<span>更新 <b>${esc(D.updated.slice(5).replace('-','/'))}</b></span>` +
+    `<span>下次 <b>${esc(D.next)}</b></span>` +
+    `<span class="chip ${D.mode === '完整' ? 'full' : 'off'}">${D.mode === '完整' ? '完整資料' : '離線模式'}</span>`;
+  $('lede').textContent = D.headline;
+
+  const icon = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5 18.5 17h-17z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1" fill="currentColor"/></svg>';
+  $('warns').innerHTML = (D.warnings || []).map(w =>
+    `<div class="warn ${esc(w.level)}" role="note">${icon}<div><div class="t">${esc(w.title)}<span class="v">${esc(w.valid)}</span></div><p>${esc(w.text)}</p></div></div>`).join('');
+
+  $('cards').innerHTML = D.locations.map(l => `
+    <article class="card">
+      <div class="card-top">
+        <h3>${esc(l.name)}<small>${esc(l.sub)}</small></h3>
+        <span class="risk r${Math.min(4, l.level)}"><i></i>風險 ${esc(l.risk)}</span>
+      </div>
+      <p class="now">${esc(l.now)}</p>
+      <div class="umb"><div><span>帶傘</span> <b>${esc(l.umbrella)}</b></div><div><span>降雨機率</span> <b>${esc(l.pop)}</b></div></div>
+      <dl class="kv">
+        <div><dt>過去 1 小時</dt><dd>${Number(l.rain1h).toFixed(1)}<small>mm</small></dd></div>
+        <div><dt>今日累積</dt><dd title="${esc(l.todayNote)}">${Number(l.today).toFixed(1)}<small>mm</small></dd></div>
+        <div><dt>今日剩餘</dt><dd>${esc(l.remaining)}<small>mm</small></dd></div>
+      </dl>
+    </article>`).join('');
+
+  const bins = [[0.1,'h0','< 0.1'],[1,'h1','0.1–1'],[5,'h2','1–5'],[10,'h3','5–10'],[20,'h4','10–20'],[Infinity,'h5','≥ 20']];
+  const bin = v => bins.find(b => v < b[0]);
+  const days = D.days.map(s => { const [y,m,d] = s.split('-').map(Number); const w = new Date(Date.UTC(y,m-1,d)).getUTCDay(); return {m, d, w}; });
+  let html = '<thead><tr><th class="loc" scope="col">地點</th>' + days.map(d =>
+    `<th scope="col"><span class="d">${d.m}/${d.d}</span>週${WD[d.w]}</th>`).join('') + '</tr></thead><tbody>';
+  for (const [loc, cells] of Object.entries(D.matrix)) {
+    html += `<tr><th class="loc" scope="row">${esc(loc)}</th>` + cells.map((c, i) => {
+      const b = bin(c.yr);
+      const tip = `${loc} ${days[i].m}/${days[i].d}：yr ${c.yr} mm；meteoblue ${c.mb} mm；氣象署 ${c.cwa || '（未提供機率）'} ${c.wx}`;
+      return `<td tabindex="0" title="${esc(tip)}" style="background:var(--${b[1]});color:var(--i${b[1].slice(1)})">
+        <div class="mm">${c.yr.toFixed(1)}</div>
+        <div class="sub">mb ${esc(c.mb)}<span class="wx">${c.cwa ? esc(c.cwa) + ' · ' : ''}${esc(c.wx)}</span></div></td>`;
+    }).join('') + '</tr>';
+  }
+  $('heat').innerHTML = html + '</tbody>';
+  $('legend').innerHTML = '<span>yr 日雨量</span>' + bins.map(b => `<span class="sw"><i style="background:var(--${b[1]})"></i>${b[2]}</span>`).join('') + '<span>mm</span>';
+
+  const agreeCls = a => a.startsWith('高') ? 'a-high' : a.startsWith('中') ? 'a-mid' : 'a-low';
+  $('notable').innerHTML = D.notable.map(n =>
+    `<li><div class="when">${esc(n.when)}<span class="where">${esc(n.where)}</span></div><span class="agree ${agreeCls(n.agree)}">一致度 ${esc(n.agree)}</span><div class="detail">${esc(n.detail)}</div></li>`).join('');
+  const p = D.peak;
+  $('peak').innerHTML = `<div class="big">${esc(p.value)}<span>${esc(p.where)} ${esc(p.when)}</span></div><p>${esc(p.note)}</p>`;
+  $('changes').innerHTML = D.changes.map(c => `<li>${esc(c)}</li>`).join('');
+  $('srcs').innerHTML = D.sources.map(s => `<div><span>${esc(s[0])}</span><span class="mono">${esc(s[1])}</span></div>`).join('');
+  $('unc').textContent = '第 5–7 天不確定性：' + D.uncertainty;
+})();
+</script>
