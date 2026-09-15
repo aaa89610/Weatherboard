@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
     # 只有看板本身變動才部署;抓取 job 推的原始快照不需要重新發布
-    paths: ['index.html', 'data.json', 'template.html', '.nojekyll']
+    paths: ['report.html', 'index.html', 'data.json', 'template.html', '.nojekyll']
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>北部六地雨情判讀</title>
+<style>
+:root{
+  --bg:#080b12; --panel:#0e1420; --panel-2:#131b2a; --line:#1e2a3d;
+  --ink:#dbe5f2; --dim:#7d8da5; --faint:#556377;
+  --cyan:#35e0d8; --amber:#ffb636; --red:#ff5a6e; --green:#4ade80; --violet:#a78bfa;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Noto Sans TC","Segoe UI",sans-serif;
+  line-height:1.65;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 500px at 12% -10%,rgba(53,224,216,.10),transparent 60%),
+    radial-gradient(700px 400px at 95% 0%,rgba(167,139,250,.08),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 16px 72px}
+
+header{padding-block:40px 24px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--cyan);
+  text-transform:uppercase;margin:0 0 10px;display:flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 12px var(--cyan)}
+h1{margin:0;font-size:clamp(25px,4.6vw,38px);letter-spacing:-.02em;font-weight:650}
+.sub{color:var(--dim);margin:10px 0 0;font-size:14.5px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-family:var(--mono);font-size:11.5px;color:var(--dim);
+  border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 12px}
+.chip b{color:var(--ink);font-weight:600}
+
+h2{font-size:12px;font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);margin:44px 0 16px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+
+.alert{margin-top:26px;border:1px solid rgba(255,90,110,.42);border-left:3px solid var(--red);
+  background:linear-gradient(90deg,rgba(255,90,110,.11),rgba(255,90,110,.02));
+  border-radius:10px;padding:16px 18px}
+.alert .tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--red);
+  text-transform:uppercase;font-weight:700}
+.alert h3{margin:7px 0 6px;font-size:17px}
+.alert p{margin:0;color:var(--dim);font-size:14px}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(232px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px 16px;
+  position:relative;overflow:hidden}
+.card::after{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:var(--rk,var(--faint))}
+.card h3{margin:0;font-size:16.5px;font-weight:620}
+.card .where{font-size:11.5px;color:var(--faint);font-family:var(--mono);margin-top:2px}
+.pop{font-family:var(--mono);font-size:29px;font-weight:600;margin:12px 0 2px;color:var(--rk,var(--ink));
+  letter-spacing:-.02em}
+.pop small{font-size:13px;color:var(--faint);font-weight:400;margin-left:3px}
+.pop .na{font-size:15px;color:var(--faint);letter-spacing:.04em}
+.card dl{margin:11px 0 0;padding-top:11px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13px}
+.card dt{color:var(--faint);font-family:var(--mono);font-size:11.5px}
+.card dd{margin:0;text-align:right;color:var(--ink)}
+.card .src{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--faint);
+  word-break:break-word}
+
+.conflict{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:16px 18px;margin-bottom:11px;border-left:3px solid var(--amber)}
+.conflict h3{margin:0 0 9px;font-size:15.5px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.verdict{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;font-weight:700;white-space:nowrap}
+.v-real{background:rgba(255,90,110,.16);color:var(--red)}
+.v-scale{background:rgba(255,182,54,.16);color:var(--amber)}
+.v-ok{background:rgba(74,222,128,.14);color:var(--green)}
+.conflict p{margin:0 0 9px;color:var(--dim);font-size:14px}
+.conflict p:last-child{margin-bottom:0}
+.conflict .call{color:var(--ink);border-top:1px dashed var(--line);padding-top:9px;margin-top:11px}
+.conflict .call b{color:var(--cyan);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:3px;font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;background:var(--panel-2)}
+tbody tr:last-child td{border-bottom:none}
+td.g{color:var(--dim);white-space:normal;min-width:210px}
+
+.note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--violet);
+  border-radius:11px;padding:16px 18px;color:var(--dim);font-size:13.5px}
+.note b{color:var(--ink)}
+.note ul{margin:9px 0 0;padding-left:19px}
+.note li{margin-bottom:6px}
+.note li:last-child{margin-bottom:0}
+
+footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
+  color:var(--faint);font-size:12px;font-family:var(--mono);line-height:1.8}
+a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(53,224,216,.3)}
+a:hover{border-bottom-color:var(--cyan)}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Weatherboard · 判讀報告</p>
+  <h1>北部六地雨情判讀</h1>
+  <p class="sub">東北季風影響,台北、新北在大雨特報範圍內;新竹以南為不同降雨機制,兩者不可混談。</p>
+  <div class="meta">
+    <span class="chip">產生時間 <b>2026-09-15 13:09</b> TST</span>
+    <span class="chip">資料收集 <b>Claude</b> · 網頁搜尋</span>
+    <span class="chip">判讀 <b>Claude</b></span>
+    <span class="chip">粒度 <b>日尺度</b></span>
+  </div>
+</header>
+
+<div class="alert">
+  <span class="tag">● 生效中 · 大雨特報</span>
+  <h3>基隆市、新北市、臺北市、宜蘭縣</h3>
+  <p>中央氣象署於 09/14 20:35 發布,受東北季風影響,雨勢持續至今日(09/15)。
+     基隆北海岸、宜蘭地區及<b>大台北山區</b>有局部大雨。本報告六地中,台北市與新北三區在特報範圍內。</p>
+</div>
+
+<h2>各地狀況</h2>
+<div class="grid">
+
+  <div class="card" style="--rk:var(--red)">
+    <h3>台北市</h3><div class="where">TAIPEI · 特報範圍內</div>
+    <div class="pop">66<small>%</small></div>
+    <dl>
+      <dt>時間尺度</dt><dd>今日全日</dd>
+      <dt>氣溫</dt><dd>26 – 33 °C</dd>
+      <dt>山區</dt><dd>局部大雨</dd>
+    </dl>
+    <div class="src">Yahoo 氣象摘要 · 溫度與氣象署概況不一致,見分歧 ①</div>
+  </div>
+
+  <div class="card" style="--rk:var(--amber)">
+    <h3>板橋區</h3><div class="where">NEW TAIPEI · 特報範圍內</div>
+    <div class="pop">20<small>%</small></div>
+    <dl>
+      <dt>時間尺度</dt><dd>當下即時</dd>
+      <dt>氣溫</dt><dd>29 °C(體感 30)</dd>
+      <dt>天況</dt><dd>—</dd>
+    </dl>
+    <div class="src">台灣天氣網 · 即時值,非全日預報,見分歧 ②</div>
+  </div>
+
+  <div class="card" style="--rk:var(--amber)">
+    <h3>中和區</h3><div class="where">NEW TAIPEI · 特報範圍內</div>
+    <div class="pop">20<small>%</small></div>
+    <dl>
+      <dt>時間尺度</dt><dd>當下即時</dd>
+      <dt>氣溫</dt><dd>未取得</dd>
+      <dt>天況</dt><dd>陰</dd>
+    </dl>
+    <div class="src">twipcam · 即時值,非全日預報,見分歧 ②</div>
+  </div>
+
+  <div class="card" style="--rk:var(--faint)">
+    <h3>土城區</h3><div class="where">NEW TAIPEI · 特報範圍內</div>
+    <div class="pop"><span class="na">未取得</span></div>
+    <dl>
+      <dt>時間尺度</dt><dd>—</dd>
+      <dt>氣溫</dt><dd>未取得</dd>
+      <dt>天況</dt><dd>—</dd>
+    </dl>
+    <div class="src">本次搜尋未回傳土城區數值。僅知其位於新北市大雨特報範圍內,未以鄰區數值代填。</div>
+  </div>
+
+  <div class="card" style="--rk:var(--amber)">
+    <h3>新竹市</h3><div class="where">HSINCHU CITY · 特報範圍外</div>
+    <div class="pop">55<small>%</small></div>
+    <dl>
+      <dt>時間尺度</dt><dd>今日全日</dd>
+      <dt>氣溫</dt><dd>25 – 33 °C</dd>
+      <dt>天況</dt><dd>—</dd>
+    </dl>
+    <div class="src">Yahoo 氣象摘要 · 機制與北北基不同,見分歧 ③</div>
+  </div>
+
+  <div class="card" style="--rk:var(--amber)">
+    <h3>竹北市</h3><div class="where">HSINCHU COUNTY · 特報範圍外</div>
+    <div class="pop">55<small>%</small></div>
+    <dl>
+      <dt>時間尺度</dt><dd>日尺度</dd>
+      <dt>氣溫</dt><dd>25 – 33 °C</dd>
+      <dt>天況</dt><dd>局部雷雨</dd>
+    </dl>
+    <div class="src">AccuWeather 10 日預報 · 機制與北北基不同,見分歧 ③</div>
+  </div>
+
+</div>
+
+<h2>跨來源分歧</h2>
+
+<div class="conflict">
+  <h3>① 台北高溫:33 °C vs 27–31 °C <span class="verdict v-real">實質分歧</span></h3>
+  <p>Yahoo 氣象摘要給台北市今日高溫 33 °C,但中央氣象署天氣概況明確寫「北部及宜蘭白天高溫略降,
+     北部及東半部 27 至 31 度」。兩者相差 2–6 °C,且方向相反——一個說熱,一個說降溫。</p>
+  <p class="call"><b>判讀</b>
+     採信氣象署的 27–31 °C。氣象署是特報發布者,對今日東北季風的掌握最直接;
+     33 °C 較可能是未更新的前日值或不同測站。卡片上的 33 °C 保留原樣標示來源,不改寫成氣象署數值。</p>
+</div>
+
+<div class="conflict">
+  <h3>② 板橋、中和 20% vs 台北市 66% <span class="verdict v-scale">時間尺度不一致</span></h3>
+  <p>板橋與中和的 20% 來自「即時」欄位,台北市的 66% 是「今日全日」。
+     兩者不是同一個問題的兩個答案——全日機率本來就會高於任一瞬間。</p>
+  <p class="call"><b>判讀</b>
+     不可直接比較,也不能因此推論新北比台北乾。三區同在大雨特報範圍內,
+     實際風險應以特報為準,而非 20% 這個數字。</p>
+</div>
+
+<div class="conflict">
+  <h3>③ 新竹、竹北 55% vs 概況「其他地區多雲到晴」 <span class="verdict v-ok">機制不同,非矛盾</span></h3>
+  <p>氣象署概況說降雨集中在「迎風面桃園以北」,新竹在桃園以南,理應偏乾;
+     但 AccuWeather 給竹北 55% 且註明「局部雷雨」。</p>
+  <p class="call"><b>判讀</b>
+     這兩件事講的不是同一種雨。氣象署描述的是東北季風迎風面地形雨,
+     AccuWeather 的雷雨指向午後熱對流——後者不受迎風面限制。兩者可以同時成立,不算矛盾。
+     新竹一帶的雨較可能落在午後且短促,與北北基整日綿雨的型態不同。</p>
+</div>
+
+<h2>後續展望</h2>
+<div class="scroll">
+<table>
+  <thead><tr><th>時間</th><th>環境場</th><th>對六地的影響</th></tr></thead>
+  <tbody>
+    <tr><td>09/15 今日</td><td>東北季風</td>
+        <td class="g">台北、新北持續降雨,大台北山區局部大雨,特報生效中</td></tr>
+    <tr><td>09/16 明日</td><td>未取得</td>
+        <td class="g">本次搜尋未取得明日獨立描述,不臆測</td></tr>
+    <tr><td>09/17 週四</td><td>季風減弱轉偏東風</td>
+        <td class="g">大台北仍有局部短暫陣雨,其他地區多雲到晴;強度較今日緩和</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>資料來源與方法</h2>
+<div class="note">
+  <b>本頁的資料收集與判讀都由 Claude 完成</b>,GitHub 只負責把這個檔案發布成網頁。
+  <ul>
+    <li><b>收集方式</b>:網頁搜尋。本執行環境的網路白名單擋住 <span style="font-family:var(--mono)">www.cwa.gov.tw</span>、
+        <span style="font-family:var(--mono)">api.met.no</span>、<span style="font-family:var(--mono)">www.meteoblue.com</span>(一律 403),
+        無法直接抓取官方端點。</li>
+    <li><b>因此粒度是日尺度</b>,不是逐時。搜尋摘要給不出「明天下午 3 點的降雨機率」這種解析度,
+        本頁也就不提供——不是省略,是取不到。</li>
+    <li><b>缺漏一律標示「未取得」</b>,不以鄰近地區數值或內插填補。土城區與明日展望即為此。</li>
+    <li><b>各數值保留原始來源</b>,即使判讀認為某來源較可信(見分歧 ①),也不改寫卡片上的原始數字。</li>
+  </ul>
+</div>
+
+<footer>
+  收集 · 判讀 · 產生 by Claude ｜ 部署 by GitHub Pages<br>
+  來源:中央氣象署天氣概況與大雨特報(經新聞轉載)、Yahoo 氣象、AccuWeather、台灣天氣網、twipcam<br>
+  下次更新:每 2 小時(台灣時間 07–21)
+</footer>
+
+</div>
+</body>
+</html>
