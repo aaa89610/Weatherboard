@@ -40,17 +40,9 @@ def fetch_stations():
             obs_time, time_pat = m.group(1).strip(), pat[:14]
             break
     # 抓不到時留下探針：下一次執行的 log 就能看出頁面實際格式，不必反覆猜
-    if obs_time:
-        time_probe = []
-    else:
-        # H:MM 找不到時，把頁首文字與其他時間樣候選一起留下——
-        # 空探針只說明「沒有 H:MM」，說不出頁面長什麼樣。
-        time_probe = {
-            'hhmm': re.findall(r"[^|]{0,18}\d{1,2}:\d{2}[^|]{0,8}", t)[:3],
-            'cjk_time': re.findall(r"\d{1,2}\s*[時点]\s*\d{0,2}\s*分?", t)[:3],
-            'digits8plus': re.findall(r"\d{8,14}", t)[:3],
-            'head': t[:400],
-        }
+    # 2026-09-16 實測：這個 MOD 片段只有資料列，沒有表頭也沒有任何時間字串
+    # （H:MM、中文時間、數字串三路探針全空）。留輕量探針，格式改版時會浮現。
+    time_probe = [] if obs_time else re.findall(r"\d{1,2}[:時]\d{2}", t)[:2]
 
     obs, hit6, hit5, miss = {}, [], [], []
     for sid in sp.ST:
@@ -167,7 +159,13 @@ def main():
         'schema': 'rain-snapshot/2',
         'stamp': now.isoformat(timespec='minutes'),
         'mode': 'actions+scrape',
-        'obs': {'time': meta['obs_time'], 'station_count': len(obs), 'stations': obs},
+        'obs': {
+            'time': meta['obs_time'],          # 該頁不提供時，為 None，不要猜
+            # 頁面每 10 分鐘更新一次，所以實際觀測時刻落在 [fetched_at - 10min, fetched_at]。
+            # 這是有界限的說明，不是推估值；報告要寫區間而不是寫成精確時刻。
+            'fetched_at': now.isoformat(timespec='minutes'),
+            'time_bound_min': 10 if not meta['obs_time'] else 0,
+            'station_count': len(obs), 'stations': obs},
         'spatial': {
             'terrain': sp.terrain_split(obs, box=(24.80, 25.25, 121.30, 121.70)),
             'track': sp.track(obs),
@@ -178,7 +176,7 @@ def main():
         # parser 2 起，回報 0 的站也收進 obs（parser 1 會漏掉，覆蓋率失真）
         'meta': dict({k: meta[k] for k in ('station_match', 'matched_6', 'matched_5',
                                            'missing', 'time_pattern', 'time_probe')},
-                     parser=4, warn_probe=warn_probe),
+                     parser=5, warn_probe=warn_probe),
         'errors': bb.errors,
     }
 
@@ -193,8 +191,8 @@ def main():
           f"，命中 {len(obs)}/{len(sp.ST)} 站")
     print(f"  地形分離：{snap['spatial']['terrain']['separation']}")
     print(f"  雨帶追蹤：{snap['spatial']['track']['confidence']}")
-    print(f"  觀測時刻：{meta['obs_time'] or '未取得'}"
-          + ('' if meta['obs_time'] else f"（探針：{meta['time_probe']}）"))
+    print(f"  觀測時刻：{meta['obs_time'] or '該頁不提供，以抓取時刻回推 10 分鐘為界'}"
+          + (f"（探針：{meta['time_probe']}）" if meta['time_probe'] else ''))
     print(f"  特報：原始 {warn_probe.get('raw_matches','?')} 筆 → 中文 {warn_probe.get('zh_titled','?')} 則"
           f"；提到本區 {warn_probe.get('hits_ours','?')} 則"
           f"、僅鄰近縣市 {warn_probe.get('hits_near_only','?')} 則"
