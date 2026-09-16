@@ -32,7 +32,11 @@ jobs:
 
       # 一站都沒抓到會回非 0，job 紅燈，不會寫出空快照。
       # log 會印出站碼比對方式（6碼／5碼／混合）與命中站數。
+      # CWA_KEY 有值就走開放資料 API（欄位有名稱、附 ObsTime）；
+      # 沒有或 API 失敗就自動退回爬網頁，不會因此中斷。
       - name: 抓取並做空間分析
+        env:
+          CWA_KEY: ${{ secrets.CWA_KEY }}
         run: python analyze/fetch_v2.py
 
       - name: 提交快照

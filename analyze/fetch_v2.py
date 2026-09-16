@@ -19,10 +19,73 @@ import spatial as sp
 
 TZ = ZoneInfo('Asia/Taipei')
 
+# 金鑰只從環境變數讀。絕不寫進檔案——這個 repo 是公開的。
+CWA_KEY = os.environ.get('CWA_KEY', '').strip()
+OPENDATA = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0002-001'
+
+
+def _scrub(msg):
+    """錯誤訊息可能含完整 URL，把金鑰換掉再往外傳。"""
+    return msg.replace(CWA_KEY, '<KEY>') if CWA_KEY else msg
+
 # 鄉鎮 TID／縣市碼（座標與代表站來自 stations.json，不在這裡重複寫）
 TID = {'台北市': ('6300200', '63'), '板橋區': ('6500100', '65'), '中和區': ('6500300', '65'),
        '土城區': ('6501300', '65'), '樹林區': ('6500700', '65'),
        '新竹市': ('1001802', '10018'), '竹北市': ('1000401', '10004')}
+
+
+def fetch_stations_api():
+    """走開放資料 API：欄位有名稱，且提供 ObsTime。需要 CWA_KEY。
+
+    比爬網頁好的地方：不必靠欄位位置推斷語意，也拿得到精確觀測時刻。
+    回傳 (obs, meta)；失敗回 (None, meta) 讓呼叫端退回爬網頁。
+    """
+    ids = list(sp.ST)
+    obs, times, shapes = {}, [], set()
+    # StationId 一次太多會被擋，拆成每組 10 個
+    for i in range(0, len(ids), 10):
+        group = ids[i:i + 10]
+        url = (f"{OPENDATA}?Authorization={CWA_KEY}&format=JSON"
+               f"&StationId={','.join(group)}")
+        try:
+            raw = json.loads(bb.get(url))
+        except Exception as e:                      # noqa: BLE001
+            return None, {'api_error': f"{type(e).__name__}: {_scrub(str(e))[:120]}"}
+
+        rec = raw.get('records') or {}
+        rows = rec.get('Station') or rec.get('location') or []
+        shapes.add(','.join(sorted(rec.keys()))[:60])
+        for st in rows:
+            sid = st.get('StationId') or st.get('stationId')
+            if sid not in sp.ST:
+                continue
+            el = st.get('RainfallElement') or {}
+
+            def mm(key):
+                v = (el.get(key) or {}).get('Precipitation')
+                try:
+                    v = float(v)
+                except (TypeError, ValueError):
+                    return None
+                # 氣象署用負值當缺測哨兵（-99/-990/-998），不是 0
+                return None if v < 0 else v
+
+            p10, p1h, now = mm('Past10Min'), mm('Past1hr'), mm('Now')
+            if p10 is None and p1h is None and now is None:
+                continue                            # 整站缺測，不放進 obs
+            obs[sid] = {'p10': p10 or 0.0, 'p1h': p1h or 0.0, 'now': now or 0.0}
+            t = (st.get('ObsTime') or {}).get('DateTime')
+            if t:
+                times.append(t)
+
+    if not obs:
+        return None, {'api_error': 'API 回應中沒有任何可用測站', 'shapes': sorted(shapes)}
+    return obs, {'obs_time': max(times) if times else None,
+                 'source': 'opendata-api', 'matched_6': len(obs), 'matched_5': 0,
+                 'missing': [s for s in sp.ST if s not in obs],
+                 'station_match': 'API（StationId 直接比對）',
+                 'time_pattern': 'ObsTime.DateTime', 'time_probe': [],
+                 'shapes': sorted(shapes)}
 
 
 def fetch_stations():
@@ -140,7 +203,18 @@ def main():
     now = dt.datetime.now(TZ)
     stamp = now.strftime('%Y%m%dT%H%M')
 
-    obs, meta = fetch_stations()
+    api_note = None
+    obs, meta = (None, {})
+    if CWA_KEY:
+        obs, meta = fetch_stations_api()
+        if obs is None:
+            api_note = meta.get('api_error', 'API 失敗')
+            print(f"API 失敗，退回爬網頁：{api_note}", file=sys.stderr)
+    if not obs:
+        obs, meta = fetch_stations()
+        meta['source'] = 'scrape'
+        if api_note:
+            meta['api_error'] = api_note
     if not obs:
         print('一站都沒抓到，不寫快照。', meta, file=sys.stderr)
         print('errors:', bb.errors, file=sys.stderr)
@@ -174,9 +248,10 @@ def main():
         'forecasts': fetch_forecasts(),
         'warnings': warnings,
         # parser 2 起，回報 0 的站也收進 obs（parser 1 會漏掉，覆蓋率失真）
-        'meta': dict({k: meta[k] for k in ('station_match', 'matched_6', 'matched_5',
-                                           'missing', 'time_pattern', 'time_probe')},
-                     parser=5, warn_probe=warn_probe),
+        'meta': dict({k: meta.get(k) for k in ('station_match', 'matched_6', 'matched_5',
+                                               'missing', 'time_pattern', 'time_probe',
+                                               'source', 'api_error', 'shapes')},
+                     parser=6, warn_probe=warn_probe),
         'errors': bb.errors,
     }
 
@@ -187,8 +262,9 @@ def main():
         json.dump(snap, f, ensure_ascii=False, indent=1)
 
     print(f"寫入 {path}")
-    print(f"  站碼比對：{meta['station_match']}（6碼 {meta['matched_6']} / 5碼 {meta['matched_5']}）"
-          f"，命中 {len(obs)}/{len(sp.ST)} 站")
+    print(f"  來源：{meta.get('source')}"
+          + (f"（API 失敗：{meta['api_error']}）" if meta.get('api_error') else ''))
+    print(f"  站碼比對：{meta.get('station_match')}，命中 {len(obs)}/{len(sp.ST)} 站")
     print(f"  地形分離：{snap['spatial']['terrain']['separation']}")
     print(f"  雨帶追蹤：{snap['spatial']['track']['confidence']}")
     print(f"  觀測時刻：{meta['obs_time'] or '該頁不提供，以抓取時刻回推 10 分鐘為界'}"
