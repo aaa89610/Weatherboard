@@ -31,6 +31,7 @@ GitHub Actions  deploy.yml
 | 路徑 | 說明 |
 | --- | --- |
 | `data/v2/` | 固定 schema 快照，可跨時間比較 |
+| `analyze/fetch_v2.py` | 在 Actions 上抓測站與預報、跑空間分析、寫 v2 快照 |
 | `data/raw/` | 舊格式快照 22 筆（09/11–09/15），每筆 schema 不同，僅供淺層參考 |
 | `spatial/` | 47 站表與空間分析模組（純函式：envelope／summarize／terrain_split／track） |
 | `analyze/load.py` | 讀 `data/` 全部內容，輸出跨時間摘要 |
@@ -38,6 +39,17 @@ GitHub Actions  deploy.yml
 | `report.json` | 本次判讀結果 |
 | `report.html` | 部署到 Pages 的報告 |
 | `rain-system-20260915/` | 前一代系統完整備份，含 `UPDATE_PROCEDURE.md` |
+
+## 快照的 parser 版本
+
+`meta.parser = 2` 起，**回報 0 的測站也會收進 `obs`**。
+
+氣象署頁面用 `-` 表示 0，parser 1 誤把它當成「沒回報」而整站丟棄，後果是
+環域覆蓋率永遠顯示 N/N、`terrain_split` 的平地中位數只由濕站算出而低估地形分離，
+且「查無資料」與「確認沒下雨」無法區分。
+
+`20260915T2037` 到 `20260916T1050` 這 4 筆是 parser 1 產生的，
+覆蓋率與地形統計偏高，判讀時不要採信這兩項；測站數值本身仍是實測值。
 
 ## 空間分析的三道守門
 

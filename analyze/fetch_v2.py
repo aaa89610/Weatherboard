@@ -44,13 +44,13 @@ def fetch_stations():
                 continue
             cells = [c.strip() for c in t[i:i + 260].split("|")[1:]][:14]
             nums = [c for c in cells if c == "-" or re.match(r"^\d+(\.\d+)?$", c)]
-            vals = [None if c == "-" else float(c) for c in nums[:7]]
+            # 站出現在頁面上＝有回報。"-" 是回報 0，不是沒回報——
+            # 把回報 0 的站丟掉會讓環域覆蓋率永遠是 N/N，
+            # 也會讓 terrain_split 的平地中位數只由濕站算出而低估地形分離。
+            vals = [0.0 if c == "-" else float(c) for c in nums[:7]]
             if len(vals) < 7:
                 continue
-            p10, p1h, now = vals[0], vals[1], vals[6]
-            if p10 is None and p1h is None and now is None:
-                continue
-            obs[sid] = {'p10': p10 or 0.0, 'p1h': p1h or 0.0, 'now': now or 0.0}
+            obs[sid] = {'p10': vals[0], 'p1h': vals[1], 'now': vals[6]}
             bucket.append(sid)
             break
         else:
@@ -130,7 +130,9 @@ def main():
         },
         'forecasts': fetch_forecasts(),
         'warnings': warnings,
-        'meta': {k: meta[k] for k in ('station_match', 'matched_6', 'matched_5', 'missing')},
+        # parser 2 起，回報 0 的站也收進 obs（parser 1 會漏掉，覆蓋率失真）
+        'meta': dict({k: meta[k] for k in ('station_match', 'matched_6', 'matched_5', 'missing')},
+                     parser=2),
         'errors': bb.errors,
     }
 
