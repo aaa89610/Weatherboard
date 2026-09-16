@@ -7,7 +7,8 @@
 
 判斷一律留給讀這份摘要的人（或模型），這裡不寫任何閾值。
 """
-import json, os, glob, sys
+import json, os, glob, sys, datetime as dt
+from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCS = ['台北市', '板橋區', '中和區', '土城區', '樹林區', '新竹市', '竹北市']
@@ -90,9 +91,31 @@ def digest():
             'legacy_files': [r['file'] for r in legacy]}
 
 
+def age_minutes(stamp):
+    """最新快照距現在幾分鐘。stamp 解析不了就回 None，不猜。"""
+    try:
+        t = dt.datetime.fromisoformat(stamp)
+    except Exception:
+        return None
+    now = dt.datetime.now(ZoneInfo('Asia/Taipei'))
+    if t.tzinfo is None:
+        t = t.replace(tzinfo=ZoneInfo('Asia/Taipei'))
+    return int((now - t).total_seconds() // 60)
+
+
 if __name__ == '__main__':
     d = digest()
-    print(f"v2 快照 {d['v2_count']} 筆；舊快照 {d['legacy_count']} 筆；最新 {d['latest_stamp']}\n")
+    age = age_minutes(d['latest_stamp']) if d['latest_stamp'] else None
+    if age is None:
+        tag = '（無法判斷新鮮度）'
+    elif age > 180:
+        tag = f'← 已經 {age} 分鐘前，過舊，不可當成現況'
+    elif age > 90:
+        tag = f'← {age} 分鐘前，偏舊，報告要標明觀測時刻'
+    else:
+        tag = f'← {age} 分鐘前'
+    print(f"v2 快照 {d['v2_count']} 筆；舊快照 {d['legacy_count']} 筆")
+    print(f"最新 {d['latest_stamp']}  {tag}\n")
 
     print("── 地形分離 ──")
     for stamp, t in d['terrain']:
