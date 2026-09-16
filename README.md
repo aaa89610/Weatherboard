@@ -51,6 +51,7 @@ GitHub Actions  deploy.yml
 | 3 | 觀測時刻多樣式比對（失敗留 `time_probe`）；特報不再用內容關鍵字過濾，全部保留 |
 | 4 | `time_probe` 加入頁首與中文時間樣候選；特報改標 `areas_ours` / `areas_near` 兩份清單 |
 | 5 | 確認該頁不提供觀測時刻，改以 `fetched_at` ± `time_bound_min` 表達時間界限 |
+| 6 | 優先走開放資料 API（欄位有名稱、附 `ObsTime`），失敗自動退回爬網頁 |
 
 parser 2 起，**回報 0 的測站也會收進 `obs`**。
 
@@ -60,6 +61,23 @@ parser 2 起，**回報 0 的測站也會收進 `obs`**。
 
 `20260915T2037` 到 `20260916T1050` 這 4 筆是 parser 1 產生的，
 覆蓋率與地形統計偏高，判讀時不要採信這兩項；測站數值本身仍是實測值。
+
+## 氣象署金鑰
+
+抓取優先走開放資料 API `O-A0002-001`，需要金鑰。金鑰存成 GitHub Actions secret
+`CWA_KEY`，程式只從環境變數讀，**絕不寫進檔案**——這個 repo 是公開的。
+
+設定位置：Settings → Secrets and variables → Actions → New repository secret，
+名稱 `CWA_KEY`。
+
+沒有設 secret 也能運作：`fetch_v2.py` 會自動退回爬網頁，只是少了精確 `ObsTime`，
+且欄位語意得靠位置推斷。`meta.source` 記錄該次實際走哪條路
+（`opendata-api` 或 `scrape`），API 失敗時 `meta.api_error` 記錄原因，
+錯誤訊息中的金鑰會被遮成 `<KEY>`。
+
+API 路徑另外會排除氣象署的缺測哨兵（負值如 -998），不與「回報 0」混為一談。
+
+申請：<https://opendata.cwa.gov.tw/user/authkey>
 
 ## 觀測時刻
 
