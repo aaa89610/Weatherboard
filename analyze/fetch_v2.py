@@ -40,7 +40,17 @@ def fetch_stations():
             obs_time, time_pat = m.group(1).strip(), pat[:14]
             break
     # 抓不到時留下探針：下一次執行的 log 就能看出頁面實際格式，不必反覆猜
-    time_probe = [] if obs_time else re.findall(r"[^|]{0,18}\d{1,2}:\d{2}[^|]{0,8}", t)[:3]
+    if obs_time:
+        time_probe = []
+    else:
+        # H:MM 找不到時，把頁首文字與其他時間樣候選一起留下——
+        # 空探針只說明「沒有 H:MM」，說不出頁面長什麼樣。
+        time_probe = {
+            'hhmm': re.findall(r"[^|]{0,18}\d{1,2}:\d{2}[^|]{0,8}", t)[:3],
+            'cjk_time': re.findall(r"\d{1,2}\s*[時点]\s*\d{0,2}\s*分?", t)[:3],
+            'digits8plus': re.findall(r"\d{8,14}", t)[:3],
+            'head': t[:400],
+        }
 
     obs, hit6, hit5, miss = {}, [], [], []
     for sid in sp.ST:
@@ -100,7 +110,10 @@ def fetch_forecasts():
     return out
 
 
-AREA = re.compile(r"臺北|台北|新北|新竹|北部|大臺北|大台北|北臺|北台|桃園")
+# 本報告的七個地點所屬行政區。桃園、苗栗等鄰近縣市另外列，
+# 因為「鄰近縣市有特報」與「本區有特報」是兩回事，不能混為一談。
+AREA_OURS = ['臺北', '台北', '新北', '新竹', '大臺北', '大台北', '北部', '北臺', '北台']
+AREA_NEAR = ['桃園', '苗栗', '基隆', '宜蘭']
 
 def fetch_warnings():
     """全部中文特報都保留，只標記是否提到本區。
@@ -123,9 +136,12 @@ def fetch_warnings():
         body = re.sub(r"\\n", " ", content).strip()
         body = re.sub(r"^發布時間：[\d/:\s]+", "", body)
         out.append({'title': title, 'issued': issued, 'validto': validto,
-                    'text': body[:220].strip(), 'mentions_area': bool(AREA.search(body))})
+                    'text': body[:220].strip(),
+                    'areas_ours': [a for a in AREA_OURS if a in body],
+                    'areas_near': [a for a in AREA_NEAR if a in body]})
     return out, {'bytes': len(t), 'raw_matches': len(raw), 'zh_titled': len(out),
-                 'mentions_area': sum(1 for w in out if w['mentions_area'])}
+                 'hits_ours': sum(1 for w in out if w['areas_ours']),
+                 'hits_near_only': sum(1 for w in out if not w['areas_ours'] and w['areas_near'])}
 
 
 def main():
@@ -162,7 +178,7 @@ def main():
         # parser 2 起，回報 0 的站也收進 obs（parser 1 會漏掉，覆蓋率失真）
         'meta': dict({k: meta[k] for k in ('station_match', 'matched_6', 'matched_5',
                                            'missing', 'time_pattern', 'time_probe')},
-                     parser=3, warn_probe=warn_probe),
+                     parser=4, warn_probe=warn_probe),
         'errors': bb.errors,
     }
 
@@ -180,7 +196,8 @@ def main():
     print(f"  觀測時刻：{meta['obs_time'] or '未取得'}"
           + ('' if meta['obs_time'] else f"（探針：{meta['time_probe']}）"))
     print(f"  特報：原始 {warn_probe.get('raw_matches','?')} 筆 → 中文 {warn_probe.get('zh_titled','?')} 則"
-          f"，其中提到本區 {warn_probe.get('mentions_area','?')} 則"
+          f"；提到本區 {warn_probe.get('hits_ours','?')} 則"
+          f"、僅鄰近縣市 {warn_probe.get('hits_near_only','?')} 則"
           f"（檔案 {warn_probe.get('bytes','?')} bytes）")
     print(f"  失敗來源 {len(bb.errors)} 個")
     if meta['missing']:
