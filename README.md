@@ -6,15 +6,12 @@
 
 ## 架構
 
-raw data 落進 `data/`，Claude 讀整個資料夾做空間分析與判讀，產生 HTML 報告覆蓋 Pages 檔案。
+抓取、空間分析、判讀、產生報告都在 Claude session 內完成，GitHub 只負責部署。
 
 ```
-抓取（runner，網路不受限）
-  → data/v2/<stamp>.json      固定 schema：rain-snapshot/2
-       ↓
-Claude Routine（每 2 小時）
-  → analyze/load.py           讀 data/ 全部內容，整理跨時間摘要
-  → spatial/spatial.py        環域 / 地形分離 / 雨帶追蹤
+Claude Routine（每 2 小時，台灣時間 07–21）
+  → analyze/fetch_v2.py    抓 47 站與預報，跑空間分析，寫 data/v2/<stamp>.json
+  → analyze/load.py        讀 data/ 全部內容，跨時間比對
   → 判讀（人／模型做，不寫成閾值）
   → report.json → analyze/render.py → report.html
   → git push main
@@ -23,8 +20,11 @@ GitHub Actions  deploy.yml
   → 發布到 GitHub Pages
 ```
 
-判讀與版型分離：`report.json` 只放判讀結果，CSS 與結構固定在 `analyze/render.py`，
-每次更新不必重寫版面。
+`.github/workflows/fetch.yml` 保留但**不排程**，僅供備援手動觸發。
+
+2026-09-21 之前抓取跑在 Actions 上，因為當時 Claude session 的網路白名單擋住氣象署。
+白名單放寬後兩段合併，少一個跨平台交接，也不再受 GitHub 排程掉 tick 影響
+（實測 6 天只跑 20 次，設定為 48 次）。
 
 ## 目錄
 

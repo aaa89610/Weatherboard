@@ -87,14 +87,15 @@ a:hover{border-bottom-color:var(--cyan)}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <header><p class="eyebrow">Weatherboard · 空間判讀</p>
-<h1>北部七地雨情判讀</h1><p class="sub">七地<b>全部無雨</b>:46 站實測、環域共 62 站次全數為 0。三則特報生效中,<b>沒有一則涵蓋本報告七地</b>。</p><div class="meta">
-<span class="chip">觀測時刻 <b>2026-09-21 08:50 TST</b></span>
+<h1>北部七地雨情判讀</h1><p class="sub">七地<b>全部無雨</b>。強風特報於 10:26 改版,<b>新竹市與新竹縣這次被列入</b>——與今晨版本不同。</p><div class="meta">
+<span class="chip">觀測時刻 <b>2026-09-21 10:30 TST</b></span>
 <span class="chip">測站 <b>46 / 47 · 氣象署 API</b></span>
 <span class="chip">七地有雨站 <b>0</b></span>
-<span class="chip">快照 <b>v2 27 筆</b></span>
+<span class="chip">抓取 <b>Claude 直連</b></span>
 <span class="chip">判讀 <b>Claude</b></span>
 </div></header>
-<div class="alert amber"><span class="tag">● 生效中 · 三則特報,均不涵蓋本區</span><h3>強風(桃園苗栗)、大雨(高屏)、長浪(基隆東岸)</h3><p><b>陸上強風特報</b> 09/21 04:32 → 09/22 23:00:桃園市、苗栗縣、臺中市、彰化縣、雲林縣、臺南市、屏東縣、臺東縣、澎湖縣。<b>新竹市與新竹縣再次未列入</b>——桃園與苗栗都在名單上,夾在中間的新竹連續多次被跳過。<br><b>大雨特報</b> 09/21 06:15 → 17:00:高雄及屏東地區,與本區無關。<br><b>長浪即時訊息</b> 09/21 05:33 → 15:33:基隆北海岸、東半部沿海、恆春半島及馬祖,臺東成功已觀測到 2.5 公尺浪高。基隆雖鄰近大台北,但不在本報告七地內。</p></div>
+<div class="alert"><span class="tag">● 生效中 · 陸上強風特報（涵蓋新竹）</span><h3>09/21 10:26 發布 → 09/22 23:00</h3><p>風力偏強,今(21)日至明(22)日晚上桃園市、<b>新竹市、新竹縣</b>、苗栗縣、臺中市、彰化縣、嘉義縣、屏東縣、臺東縣、澎湖縣局部地區有平均風 6 級以上或陣風 8 級以上(黃色燈號)。<br><b>本報告七地中,新竹市與竹北市在此範圍內。</b>今日無雨,但風是實際風險。</p></div>
+<div class="alert amber"><span class="tag">● 生效中 · 另兩則,不涵蓋本區</span><h3>大雨特報(高屏)、長浪即時訊息(基隆東岸)</h3><p><b>大雨特報</b> 06:15 → 17:00:高雄及屏東地區,與本區無關。<br><b>長浪即時訊息</b> 05:33 → 15:33:基隆北海岸、東半部沿海、恆春半島及馬祖,臺東成功已觀測到 2.5 公尺浪高。基隆鄰近大台北但不在本報告七地內。</p></div>
 <div class="banner"><span class="tag">空間分析 · terrain_split</span><h3>無明顯地形分離（全區皆乾）</h3>
 <div class="nums">
 <div>山區中位數<b>0.0 mm</b></div>
@@ -104,8 +105,8 @@ a:hover{border-bottom-color:var(--cyan)}
 <div>平地最大<b>0.0 mm</b></div>
 <div>有雨站<b>0 / 36</b></div>
 </div>
-<p>山區 15 站、盆地邊緣 11 站、平地 10 站,<b>中位數與最大值全部為 0.0 mm</b>。這次「無明顯地形分離」的原因不是雨均勻分布,而是根本沒有雨。</p>
-<p>與 09/15–09/16 那段對照:當時山區中位數 3.75 mm、平地 0.0 mm,比值無限大,屬於典型東北季風迎風面地形雨。<b>該型態已經結束。</b></p>
+<p>山區 15 站、盆地邊緣 11 站、平地 10 站,<b>中位數與最大值全部為 0.0 mm</b>。「無明顯地形分離」的原因是沒有雨,不是雨分布均勻。</p>
+<p>與 09/15–09/16 對照:當時山區中位數 3.75 mm、平地 0.0 mm、比值無限大,屬東北季風迎風面地形雨。<b>該型態已結束多日。</b></p>
 <p>此時不需要「平地預報值當上限」那道修正——沒有降雨可供分配。</p>
 </div>
 <h2>各地實測（環域,非單站）</h2><div class="grid">
@@ -154,49 +155,48 @@ a:hover{border-bottom-color:var(--cyan)}
 </dl>
 <div class="src">環域 8 站全部確認無雨 —— 不是查無資料</div>
 </div>
-<div class="card" style="--rk:var(--green)">
-<h3>新竹市</h3><div class="where">HSINCHU CITY</div>
+<div class="card" style="--rk:var(--amber)">
+<h3>新竹市</h3><div class="where">HSINCHU CITY · 強風特報範圍內</div>
 <div class="pop">0.0&lt;small&gt;mm&lt;/small&gt;</div><dl>
 <dt>代表站</dt><dd>0.0 mm</dd>
 <dt>環域最大</dt><dd>0.0 mm</dd>
 <dt>有雨站</dt><dd>0 / 4</dd>
 </dl>
-<div class="src">環域 4 站全部確認無雨 —— 不是查無資料</div>
+<div class="src warn">環域 4 站確認無雨,但<b>在 10:26 發布的強風特報範圍內</b></div>
 </div>
-<div class="card" style="--rk:var(--green)">
-<h3>竹北市</h3><div class="where">HSINCHU COUNTY</div>
+<div class="card" style="--rk:var(--amber)">
+<h3>竹北市</h3><div class="where">HSINCHU COUNTY · 強風特報範圍內</div>
 <div class="pop">0.0&lt;small&gt;mm&lt;/small&gt;</div><dl>
 <dt>代表站</dt><dd>0.0 mm</dd>
 <dt>環域最大</dt><dd>0.0 mm</dd>
 <dt>有雨站</dt><dd>0 / 4</dd>
 </dl>
-<div class="src">環域 4 站全部確認無雨 —— 不是查無資料</div>
+<div class="src warn">環域 4 站確認無雨,但<b>在 10:26 發布的強風特報範圍內</b></div>
 </div>
 </div>
 <h2>判讀</h2>
-<div class="conflict"><h3>① 七地全乾,且這是確認值 <span class="verdict v-ok">確認無雨</span></h3>
-<p>七地的環域站數分別是 12、12、14、8、8、4、4,合計 62 站次,<b>全部回報 0.0 mm</b>。</p>
-<p>環域站數都大於 0,代表每一地都有實際測站在回報。這與「env_n = 0」的情況完全不同——後者才是查無資料。</p>
-<p class="call"><b>判讀</b>可以明確說七地目前沒有降雨,不需要加「可能」之類的保留語。這是 62 站次的實測結果,不是預報,也不是缺漏。</p>
+<div class="conflict"><h3>① 新竹這次被列入強風特報,與今晨版本不同 <span class="verdict v-real">修正先前判斷</span></h3>
+<p>今晨 04:32 發布的強風特報列了桃園市與苗栗縣,<b>沒有新竹</b>;本站先前的報告據此指出「新竹連續多次被排除」。</p>
+<p>10:26 的改版把<b>新竹市與新竹縣加了進來</b>,涵蓋時間延長至 09/22 晚上。先前那個觀察在 09:01 的資料上成立,但已經不適用於現況。</p>
+<p class="call"><b>判讀</b>特報會在同一天內改版,範圍也會變。判定一律以<b>最新一則的實際縣市名單</b>為準,不要沿用先前報告的結論——這次就是範圍擴大的實例。</p>
 </div>
-<div class="conflict"><h3>② 上次降雨在 09/20 傍晚,且僅微量 <span class="verdict v-scale">跨快照比對</span></h3>
-<p>回溯快照,七地最後一次測到雨是 09/20 20:14:台北 12 站中 1 站測到 0.5 mm、中和 14 站中 1 站測到 0.5 mm,其餘五地全 0。</p>
-<p>0.5 mm 是翻斗式雨量計的解析度下限,等於「剛好翻一次斗」。</p>
-<p class="call"><b>判讀</b>從 09/20 傍晚至今超過 12 小時,七地實質無降雨。連 09/20 那次也只是零星觸發,不構成有意義的降雨事件。</p>
+<div class="conflict"><h3>② 七地全乾,且這是確認值 <span class="verdict v-ok">確認無雨</span></h3>
+<p>七地環域站數分別是 12、12、14、8、8、4、4,合計 62 站次,<b>全部回報 0.0 mm</b>。</p>
+<p>環域站數都大於 0,代表每一地都有實際測站在回報。這與「env_n = 0」完全不同——後者才是查無資料。</p>
+<p class="call"><b>判讀</b>可以明確說七地目前沒有降雨。這是 62 站次的實測,不是預報也不是缺漏。但新竹與竹北另有強風風險,不要因為無雨就當成無虞。</p>
 </div>
-<div class="conflict"><h3>③ 新竹連續多次被排除在強風特報之外 <span class="verdict v-scale">值得記錄的模式</span></h3>
-<p>今日強風特報列了桃園市與苗栗縣,<b>新竹市與新竹縣再次未列入</b>。09/16 的那則特報也是同樣情形:桃園、苗栗在列,新竹不在。</p>
-<p>新竹地理上夾在桃園與苗栗之間,連續被跳過不像是遺漏。</p>
-<p class="call"><b>判讀</b>判定特報是否涵蓋本區,一律以實際縣市名單為準。「鄰近縣市有特報」不等於本區有風險——新竹這個案例正是反例。</p>
-</div>
-<div class="conflict"><h3>④ 雨帶移動方向 <span class="verdict v-scale">不可判讀</span></h3>
+<div class="conflict"><h3>③ 雨帶移動方向 <span class="verdict v-scale">不可判讀</span></h3>
 <p>track() 回傳 <b>confidence: none</b>:「目前 10 分鐘內範圍內無站有雨,無法定位雨區」。</p>
-<p class="call"><b>判讀</b>沒有雨可以追蹤。本次不提供方向與速度,這與「雨在減弱」不同——是根本沒有降雨。</p>
+<p class="call"><b>判讀</b>沒有雨可以追蹤。本次不提供方向與速度——這與「雨在減弱」不同,是根本沒有降雨。</p>
 </div>
-<div class="conflict"><h3>⑤ 未來 9 天沒有明顯雨日 <span class="verdict v-ok">低雨量期</span></h3>
+<div class="conflict"><h3>④ 未來 9 天沒有明顯雨日 <span class="verdict v-ok">低雨量期</span></h3>
 <p>yr.no 對未來 9 天的日雨量,七地最大值是 09/26 的土城與樹林 2.4 mm,其餘多在 0–1.4 mm。今明兩日(09/21–22)七地全部 0 mm。</p>
 <p>氣象署鄉鎮 3 小時降雨機率今日整天 10%,天況為晴。</p>
-<p class="call"><b>判讀</b>未來一週不需要為降雨調整行程。09/25–26 有微幅上升但量級仍低,且屬第 4–5 天預報,不確定性高,留待後續更新追蹤。</p>
+<p class="call"><b>判讀</b>未來一週不需要為降雨調整行程。09/25–26 略升但量級仍低,且屬第 4–5 天預報,不確定性高,留待後續更新追蹤。</p>
+</div>
+<div class="conflict"><h3>⑤ 一站缺測 <span class="verdict v-scale">據實標示</span></h3>
+<p>47 站中 <span class="m">C0A640</span> 未取得資料,本次以 46 站計算。</p>
+<p class="call"><b>判讀</b>缺測站直接排除,不以 0 補、也不以鄰站內插。環域統計的分母因此是實際取得的站數。</p>
 </div>
 <h2>未來 9 天（yr.no 日雨量 mm）</h2><div class="scroll"><table><thead><tr>
 <th>日期</th>
@@ -206,22 +206,22 @@ a:hover{border-bottom-color:var(--cyan)}
 <th>新竹 / 竹北</th>
 <th>備註</th>
 </tr></thead><tbody>
-<tr><td>09/21 今日</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">氣象署 PoP 10%,晴;實測 46 站全 0</td></tr>
-<tr><td>09/22</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">強風特報效期至 23:00(不含本區)</td></tr>
-<tr><td>09/23</td><td>0.2</td><td>0 / 0</td><td>0.1 / 0.1</td><td>0 / 0</td><td class="g">微量</td></tr>
+<tr><td>09/21 今日</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">PoP 10% 晴;實測 46 站全 0;<b>新竹竹北強風特報</b></td></tr>
+<tr><td>09/22</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g"><b>強風特報效期至 23:00,含新竹</b></td></tr>
+<tr><td>09/23</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">無雨</td></tr>
 <tr><td>09/24</td><td>0.1</td><td>0 / 0</td><td>0 / 0</td><td>0.1 / 0.1</td><td class="g">微量</td></tr>
 <tr><td>09/25</td><td><b>1.9</b></td><td>0.4 / 0.4</td><td>1.4 / 1.4</td><td>0.1 / 0.1</td><td class="g">略升,台北最多</td></tr>
-<tr><td>09/26</td><td>1.0</td><td>1.2 / 1.2</td><td><b>2.4 / 2.4</b></td><td>0.1 / 0.1</td><td class="g"><b>九天內最大值</b>,但仍低於 3 mm</td></tr>
+<tr><td>09/26</td><td>1.0</td><td>1.2 / 1.2</td><td><b>2.4 / 2.4</b></td><td>0.1 / 0.1</td><td class="g"><b>九天內最大值</b>,仍低於 3 mm</td></tr>
 <tr><td>09/27</td><td>0.1</td><td>0.1 / 0.1</td><td>0.2 / 0.2</td><td>0.2 / 0.2</td><td class="g">微量</td></tr>
 <tr><td>09/28</td><td>0.3</td><td>0.1 / 0.1</td><td>0.2 / 0.2</td><td>0.1 / 0.1</td><td class="g">微量</td></tr>
 <tr><td>09/29</td><td>0.1</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">第 9 天,不確定性高</td></tr>
 </tbody></table></div>
 <h2>資料來源與方法</h2><div class="note">
-本頁讀 repo 內 <b>data/ 資料夾的全部內容</b>(v2 快照 27 筆),判讀由 Claude 完成,GitHub 只負責部署。<ul>
-<li><b>實測</b>:氣象署開放資料 API <span class="m">O-A0002-001</span>,<b>46 / 47 站</b>取得,1 站缺測已排除,未以 0 補。觀測時刻 08:50。</li>
-<li><b>環域半徑 9 km</b>,七地合計 62 站次。「0 / N」代表 N 站都確認無雨;「env_n = 0」才是查無資料。本次七地皆屬前者。</li>
-<li><b>特報一律保留全部中文特報</b>,再標記 <span class="m">areas_ours</span> 與 <span class="m">areas_near</span> 兩份清單。本次三則特報的 <span class="m">areas_ours</span> 全為空,故判定不涵蓋本區。</li>
-<li><b>上游抓取排程不穩定</b>:設定為每日 8 次,實測僅 3–4 次,間隔 3.4–11.6 小時。報告只在有新快照時更新,資料超過 3 小時會在頁首自動顯示警示橫幅。</li>
+抓取、空間分析、判讀、產生報告<b>都在 Claude session 內完成</b>,GitHub 只負責部署。<ul>
+<li><b>實測</b>:氣象署開放資料 API <span class="m">O-A0002-001</span>,46 / 47 站取得,<span class="m">C0A640</span> 缺測已排除、未以 0 補。觀測時刻 10:30,抓取 10:41。</li>
+<li><b>2026-09-21 起抓取改由 Claude 直接執行</b>。先前跑在 GitHub Actions 上,因為當時本執行環境的網路白名單擋住氣象署;白名單放寬後兩段合併,少一個跨平台交接,也不再受 GitHub 排程掉 tick 影響。</li>
+<li><b>環域半徑 9 km</b>,七地合計 62 站次。「0 / N」是 N 站確認無雨;「env_n = 0」才是查無資料。本次七地皆屬前者。</li>
+<li><b>特報保留全部中文特報</b>,再標 <span class="m">areas_ours</span> 與 <span class="m">areas_near</span> 兩份清單。本次 areas_ours 命中新竹,故判定涵蓋本區。</li>
 <li>缺漏一律標「未取得」,不以鄰區數值代填、不內插、不編造。</li>
 </ul></div>
 <footer>資料收集 · 空間分析 · 判讀 by Claude ｜ 部署 by GitHub Pages<br>來源:中央氣象署開放資料 API(雨量站、鄉鎮 3 小時 PoP、特報)、yr.no（MET Norway／ECMWF）<br>空間分析:spatial/spatial.py（envelope / terrain_split / track）</footer></div></body></html>
