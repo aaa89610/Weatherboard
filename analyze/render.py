@@ -4,7 +4,8 @@
 版型固定在這裡，內容由 report.json 提供 —— 判讀者只需產生 JSON，
 不必每次重寫 CSS。純函式：render(report) -> str。
 """
-import json, os, sys, html
+import json, os, sys, html, datetime as dt
+from zoneinfo import ZoneInfo
 
 CSS = """
 :root{--bg:#080b12;--panel:#0e1420;--panel-2:#131b2a;--line:#1e2a3d;--ink:#dbe5f2;
@@ -106,6 +107,32 @@ def _rich(s):
         out = out.replace(k, v)
     return out
 
+def _staleness(r):
+    """依 source_stamp 自動算資料年齡。超過 3 小時就回一則橫幅。
+
+    放在渲染層而不是判讀層：判讀者可能忘記寫，版型不會忘。
+    """
+    stamp = r.get('source_stamp')
+    if not stamp:
+        return None
+    try:
+        t = dt.datetime.fromisoformat(stamp)
+    except Exception:
+        return None
+    if t.tzinfo is None:
+        t = t.replace(tzinfo=ZoneInfo('Asia/Taipei'))
+    mins = int((dt.datetime.now(ZoneInfo('Asia/Taipei')) - t).total_seconds() // 60)
+    if mins <= 180:
+        return None
+    h, m = divmod(mins, 60)
+    return {'level': 'amber', 'tag': '● 注意 · 資料非即時',
+            'title': f'觀測資料已是 {h} 小時 {m} 分鐘前的狀態',
+            'body': f'本頁的實測值來自 <m>{stamp}</m> 的快照，不是此刻的天氣。<br>'
+                    '上游抓取排程實測一天僅執行 3–4 次（設定為 8 次），'
+                    '因此兩次快照之間可能相隔數小時。<b>判讀內容描述的是該快照時刻的狀態</b>，'
+                    '期間天氣可能已經改變。'}
+
+
 def render(r):
     P = []
     P.append('<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">')
@@ -118,7 +145,8 @@ def render(r):
         P.append(f'<span class="chip">{e(k)} <b>{e(v)}</b></span>')
     P.append('</div></header>')
 
-    for a in r.get('alerts', []):
+    stale = _staleness(r)
+    for a in ([stale] if stale else []) + r.get('alerts', []):
         cls = 'alert amber' if a.get('level') == 'amber' else 'alert'
         P.append(f'<div class="{cls}"><span class="tag">{e(a["tag"])}</span>'
                  f'<h3>{e(a["title"])}</h3><p>{_rich(a["body"])}</p></div>')

@@ -103,7 +103,39 @@ def age_minutes(stamp):
     return int((now - t).total_seconds() // 60)
 
 
+def last_report_stamp():
+    """上一份報告用的是哪一筆快照。讀不到就回 None（視為需要更新）。"""
+    try:
+        return json.load(open(os.path.join(ROOT, 'report.json'), encoding='utf-8')).get('source_stamp')
+    except Exception:
+        return None
+
+
+def check():
+    """有新快照才值得更新。回傳 (要更新?, 訊息)。
+
+    判準是「有沒有新資料」，不是「資料夠不夠新」——
+    GitHub 排程實測一天只跑 3–4 次而非 8 次，若以新鮮度當阻斷條件，
+    判讀端會永遠放棄更新。資料舊不是不更新的理由，是要標示的事實。
+    """
+    v2 = load_v2()
+    if not v2:
+        return False, '沒有任何 v2 快照'
+    newest = v2[-1][0]
+    last = last_report_stamp()
+    age = age_minutes(newest)
+    age_s = f'{age} 分鐘前' if age is not None else '時間不明'
+    if last == newest:
+        return False, f'最新快照 {newest}（{age_s}）與上次報告相同，沒有新資料'
+    return True, f'最新快照 {newest}（{age_s}）；上次報告用 {last or "無"} → 有新資料'
+
+
 if __name__ == '__main__':
+    if '--check' in sys.argv:
+        ok, msg = check()
+        print(('要更新：' if ok else '跳過：') + msg)
+        sys.exit(0 if ok else 1)
+
     d = digest()
     age = age_minutes(d['latest_stamp']) if d['latest_stamp'] else None
     if age is None:
