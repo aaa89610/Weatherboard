@@ -87,8 +87,8 @@ a:hover{border-bottom-color:var(--cyan)}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <header><p class="eyebrow">Weatherboard · 空間判讀</p>
-<h1>北部七地雨情判讀</h1><p class="sub">七地<b>全部無雨</b>,而且 46 站的<b>今日累積雨量全部是 0.0 mm</b>——不只是此刻沒下,是今天整天沒下過。強風特報最新版(10:26)涵蓋<b>新竹市與新竹縣</b>。</p><div class="meta">
-<span class="chip">觀測時刻 <b>2026-09-21 12:30 TST</b></span>
+<h1>北部七地雨情判讀</h1><p class="sub">七地<b>全部無雨</b>,而且 46 站的<b>今日累積雨量全部是 0.0 mm</b>——不只是此刻沒下,是今天到 13:40 為止一次都沒下過。強風特報最新版(10:26)涵蓋<b>新竹市與新竹縣</b>。</p><div class="meta">
+<span class="chip">觀測時刻 <b>2026-09-21 13:40 TST</b></span>
 <span class="chip">測站 <b>46 / 47 · 氣象署 API</b></span>
 <span class="chip">七地有雨站 <b>0</b></span>
 <span class="chip">抓取 <b>Claude 直連</b></span>
@@ -177,11 +177,11 @@ a:hover{border-bottom-color:var(--cyan)}
 </div>
 </div>
 <h2>判讀</h2>
-<div class="conflict"><h3>① 七地全乾,而且是「今天整天沒下過」 <span class="verdict v-ok">確認無雨</span></h3>
+<div class="conflict"><h3>① 七地全乾,而且是「今天到現在沒下過」 <span class="verdict v-ok">確認無雨</span></h3>
 <p>七地環域站數分別是 12、12、14、8、8、4、4,合計 62 站次,<b>全部回報 0.0 mm</b>。環域站數都大於 0,代表每一地都有實際測站在回報:這是「0 / N」——N 站確認無雨;<b>與「env_n = 0」(查無資料)意思相反</b>,本次七地皆屬前者。</p>
 <p>更強的一點:本看板的 <span class="m">now</span> 欄位取自氣象署 <span class="m">RainfallElement.Now</span>,是<b>本日累積雨量</b>而非瞬時雨量。09/20 的快照可以驗證這個語意——擎天崗 <span class="m">now</span> 在 13:50 是 1.0 mm、到 20:00 變 2.5 mm,同時段 <span class="m">p10</span> 與 <span class="m">p1h</span> 都是 0.0,只有累積值在長。</p>
-<p>因此本次 46 站 <span class="m">now</span> 全為 0.0 mm 的意思是:<b>今日 00:00 起到 12:30 為止,47 站網內沒有任何一站錄到降雨。</b>不是「剛好這 10 分鐘沒下」。</p>
-<p class="call"><b>判讀</b>可以明確說七地今日至 12:30 為止完全沒有降雨,依據是 46 站的本日累積實測值,不是預報也不是缺漏。但新竹與竹北另有強風風險,不要因為無雨就當成無虞。</p>
+<p>因此本次 46 站 <span class="m">now</span> 全為 0.0 mm 的意思是:<b>今日 00:00 起到 13:40 為止,47 站網內沒有任何一站錄到降雨。</b>不是「剛好這 10 分鐘沒下」。</p>
+<p class="call"><b>判讀</b>可以明確說七地今日至 13:40 為止完全沒有降雨,依據是 46 站的本日累積實測值,不是預報也不是缺漏。但新竹與竹北另有強風風險,不要因為無雨就當成無虞。</p>
 </div>
 <div class="conflict"><h3>② 雨帶移動方向:本次不准寫 <span class="verdict v-scale">不可判讀</span></h3>
 <p>第三道守門觸發。<span class="m">track()</span> 回 <b>confidence: none</b>,note 為「目前 10 分鐘內範圍內無站有雨,無法定位雨區」;<span class="m">now_centroid</span> 與 <span class="m">prev_centroid</span> 都是 <span class="m">null</span>。</p>
@@ -195,12 +195,12 @@ a:hover{border-bottom-color:var(--cyan)}
 </div>
 <div class="conflict"><h3>④ 昨日迎風面還有微量雨,今日歸零 <span class="verdict v-ok">跨時間比對</span></h3>
 <p>09/20 20:14 的快照有 6 站本日累積不為 0:<b>擎天崗 2.5</b>、基隆 1.0、陽明山 0.5、鞍部 0.5、竹子湖 0.5、信義 0.5 mm。前五站全是 <span class="m">windward</span>(迎風面),只有信義是 <span class="m">floor</span>(盆地底)。</p>
-<p>09/21 的四筆快照(00:45、09:01、10:41、12:35)<b>連迎風面都全部掛零</b>。昨天那點雨量級極小,但位置集中在大屯山系與基隆,是典型的迎風面殘餘;今日連這個殘餘都沒有。</p>
+<p>09/21 的五筆快照(00:45、09:01、10:41、12:35、13:52)<b>連迎風面都全部掛零</b>。昨天那點雨量級極小,但位置集中在大屯山系與基隆,是典型的迎風面殘餘;今日連這個殘餘都沒有,且已連續五筆快照維持如此。</p>
 <p class="call"><b>判讀</b>這不是雨區移走,是整個降雨型態停掉。搭配 track 回 none,今日北部沒有可追蹤的降雨系統。</p>
 </div>
 <div class="conflict"><h3>⑤ 未來 9 天沒有明顯雨日,新竹今日 PoP 降到 0% <span class="verdict v-ok">低雨量期</span></h3>
 <p>yr.no 逐日雨量(12:36 取得):七地九天內最大值是 09/26 的土城與樹林 <b>2.4 mm</b>,其餘多在 0–1.9 mm。今明兩日(09/21–22)七地全部 0 mm。</p>
-<p>氣象署鄉鎮 3 小時降雨機率今日午後:台北、板橋、中和、土城、樹林 <b>10%</b>,<b>新竹市與竹北 0%</b>,天況全為晴。新竹兩地的 PoP 比北北五地更低——但強風特報偏偏只涵蓋新竹,兩者指的不是同一件事。</p>
+<p>氣象署鄉鎮 3 小時降雨機率(13:53 取得,涵蓋 13–18 時):台北、板橋、中和、土城、樹林 <b>10%</b>,<b>新竹市與竹北 0%</b>,天況全為晴。新竹兩地的 PoP 比北北五地更低——但強風特報偏偏只涵蓋新竹,兩者指的不是同一件事。</p>
 <p class="call"><b>判讀</b>未來一週不需要為降雨調整行程。09/25–26 略升但量級仍低於 3 mm,且屬第 4–5 天預報,不確定性高,留待後續更新追蹤。</p>
 </div>
 <div class="conflict"><h3>⑥ 一站缺測 <span class="verdict v-scale">據實標示</span></h3>
@@ -215,7 +215,7 @@ a:hover{border-bottom-color:var(--cyan)}
 <th>新竹 / 竹北</th>
 <th>備註</th>
 </tr></thead><tbody>
-<tr><td>09/21 今日</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">PoP 北北 10%、新竹 0%,晴;實測 46 站本日累積全 0;<b>新竹竹北強風特報</b></td></tr>
+<tr><td>09/21 今日</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">PoP 北北 10%、新竹 0%,晴;實測 46 站本日累積至 13:40 全 0;<b>新竹竹北強風特報</b></td></tr>
 <tr><td>09/22</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g"><b>強風特報效期至 23:00,含新竹</b></td></tr>
 <tr><td>09/23</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">無雨</td></tr>
 <tr><td>09/24</td><td>0.1</td><td>0 / 0</td><td>0 / 0</td><td>0.1 / 0.1</td><td class="g">微量</td></tr>
@@ -227,7 +227,7 @@ a:hover{border-bottom-color:var(--cyan)}
 </tbody></table></div>
 <h2>資料來源與方法</h2><div class="note">
 抓取、空間分析、判讀、產生報告<b>都在 Claude session 內完成</b>,GitHub 只負責部署。<ul>
-<li><b>實測</b>:氣象署開放資料 API <span class="m">O-A0002-001</span>,46 / 47 站取得,<span class="m">C0A640</span> 缺測已排除、未以 0 補。<b>觀測時刻 12:30</b>(API 提供 <span class="m">ObsTime</span>,不必以抓取時刻回推),抓取 12:35。</li>
+<li><b>實測</b>:氣象署開放資料 API <span class="m">O-A0002-001</span>,46 / 47 站取得,<span class="m">C0A640</span> 缺測已排除、未以 0 補。<b>觀測時刻 13:40</b>(API 提供 <span class="m">ObsTime</span>,不必以抓取時刻回推),抓取 13:52。</li>
 <li><b>數值語意</b>:卡片上的 mm 是 <span class="m">RainfallElement.Now</span>,即<b>本日累積雨量</b>;<span class="m">p10</span> / <span class="m">p1h</span> 另存於快照,供 <span class="m">track()</span> 估質心用。</li>
 <li><b>環域半徑 9 km</b>,七地合計 62 站次。「0 / N」是 N 站確認無雨;「env_n = 0」才是查無資料。本次七地皆屬前者。</li>
 <li><b>三道守門</b>:代表站漏接<b>未觸發</b>(環域也全 0,無漏接可言);terrain_split <b>未觸發</b>(無明顯地形分離);track <b>已觸發</b>(confidence none,不寫移動方向)。</li>
