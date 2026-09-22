@@ -64,11 +64,16 @@ def strip_html(s):
 # ---------------------------------------------------------------- 氣象署
 
 def cwa_hourly(tid):
-    """[(MM/DD, HH, 天氣, PoP|None)] — 逐 1/3 小時，未來 3 天"""
+    """[(MM/DD, HH, 天氣, PoP|None, 溫度C|None)] — 逐 1/3 小時，未來 3 天
+
+    溫度欄位是「攝氏 華氏」兩個數字（例：28 82），取前者。
+    """
     t = strip_html(get(f"{CWA}/V8/C/W/Town/MOD/3hr/{tid}_3hr_m.html"))
     out = []
-    for m in re.finditer(r"(\d\d/\d\d)\(.\) (\d\d):\d\d (\S+) 看更多 溫度 [\d\s]+ 降雨機率 (\d+|-)", t):
-        out.append((m.group(1), int(m.group(2)), m.group(3), None if m.group(4) == "-" else int(m.group(4))))
+    for m in re.finditer(r"(\d\d/\d\d)\(.\) (\d\d):\d\d (\S+) 看更多 溫度 (\d+)\s*\d* 降雨機率 (\d+|-)", t):
+        out.append((m.group(1), int(m.group(2)), m.group(3),
+                    None if m.group(5) == "-" else int(m.group(5)),
+                    int(m.group(4))))
     return out
 
 def cwa_week(tid):
@@ -180,15 +185,19 @@ def cwa_stations():
 def yr(lat, lon):
     j = requests.get(f"https://www.yr.no/api/v0/locations/{lat},{lon}/forecast",
                      headers=UA, timeout=40).json()
-    days = {}
+    days, temps = {}, {}
     for d in j.get("dayIntervals", []):
-        days[d["start"][5:10].replace("-", "/")] = (d.get("precipitation") or {}).get("value")
+        k = d["start"][5:10].replace("-", "/")
+        days[k] = (d.get("precipitation") or {}).get("value")
+        tp = d.get("temperature") or {}
+        if tp.get("min") is not None or tp.get("max") is not None:
+            temps[k] = {"min": tp.get("min"), "max": tp.get("max")}
     hours = []
     for s in j.get("shortIntervals", []):
         v = (s.get("precipitation") or {}).get("value") or 0
         if v > 0:
             hours.append((s["start"][5:10].replace("-", "/"), int(s["start"][11:13]), v))
-    return {"update": j.get("update", ""), "days": days, "wet": hours}
+    return {"update": j.get("update", ""), "days": days, "temps": temps, "wet": hours}
 
 def meteoblue(lat, lon):
     h = get(f"https://www.meteoblue.com/en/weather/week/{lat:.3f}N{lon:.3f}E")

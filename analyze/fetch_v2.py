@@ -134,13 +134,15 @@ def fetch_stations():
 
 def fetch_forecasts():
     """yr.no 逐日 mm + 氣象署鄉鎮 3 小時 PoP。任一地失敗就不放該地。"""
-    yr_by_loc, pop_by_loc = {}, {}
+    yr_by_loc, yr_temp, pop_by_loc = {}, {}, {}
     for loc, (lat, lon, _rep) in sp.LOC.items():
         try:
             y = bb.yr(lat, lon)
             days = y.get('days') or {}
             if days:
                 yr_by_loc[loc] = days
+            if y.get('temps'):
+                yr_temp[loc] = y['temps']
         except Exception as e:
             bb.note_fail(f'yr.no（{loc}）', e)
         tid = TID.get(loc, (None,))[0]
@@ -149,8 +151,8 @@ def fetch_forecasts():
         try:
             rows = bb.cwa_hourly(tid)
             if rows:
-                pop_by_loc[loc] = [{'date': d, 'hour': h, 'wx': w, 'pop': p}
-                                   for d, h, w, p in rows[:24]]
+                pop_by_loc[loc] = [{'date': d, 'hour': h, 'wx': w, 'pop': p, 'temp_c': c}
+                                   for d, h, w, p, c in rows[:24]]
         except Exception as e:
             bb.note_fail(f'鄉鎮逐時（{loc}）', e)
 
@@ -158,9 +160,11 @@ def fetch_forecasts():
     if yr_by_loc:
         out['yr'] = {'issued': dt.datetime.now(TZ).isoformat(timespec='minutes'),
                      'unit': 'mm', 'by_loc': yr_by_loc}
+        if yr_temp:
+            out['yr']['temp_c'] = yr_temp          # {地點: {MM/DD: {min, max}}}
     if pop_by_loc:
         out['cwa_pop'] = {'issued': dt.datetime.now(TZ).isoformat(timespec='minutes'),
-                          'unit': '%', 'note': '鄉鎮 3 小時降雨機率（未來 24 筆）',
+                          'unit': '%', 'note': '鄉鎮 3 小時降雨機率與氣溫（未來 24 筆）',
                           'by_loc': pop_by_loc}
     return out
 
@@ -251,7 +255,7 @@ def main():
         'meta': dict({k: meta.get(k) for k in ('station_match', 'matched_6', 'matched_5',
                                                'missing', 'time_pattern', 'time_probe',
                                                'source', 'api_error', 'shapes')},
-                     parser=6, warn_probe=warn_probe),
+                     parser=7, warn_probe=warn_probe),
         'errors': bb.errors,
     }
 

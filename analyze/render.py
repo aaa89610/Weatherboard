@@ -212,6 +212,21 @@ def render(r):
             P.append('<tr>' + ''.join(cells) + '</tr>')
         P.append('</tbody></table></div>')
 
+    # 第二張表（目前用於溫度）。結構與 outlook 相同，多一個自己的標題。
+    x = r.get('outlook_extra')
+    if x:
+        P.append(f'<h2>{e(x.get("heading", "溫度"))}</h2><div class="scroll"><table><thead><tr>')
+        for h in x['cols']:
+            P.append(f'<th>{e(h)}</th>')
+        P.append('</tr></thead><tbody>')
+        for row in x['rows']:
+            cells = []
+            for i, c in enumerate(row):
+                cls = ' class="g"' if i == len(row) - 1 else ''
+                cells.append(f'<td{cls}>{_rich(c)}</td>')
+            P.append('<tr>' + ''.join(cells) + '</tr>')
+        P.append('</tbody></table></div>')
+
     if r.get('method'):
         P.append(f'<h2>{e(r.get("method_heading","資料來源與方法"))}</h2><div class="note">')
         P.append(f'{_rich(r["method"]["lead"])}<ul>')
