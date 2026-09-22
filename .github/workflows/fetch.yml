@@ -1,11 +1,9 @@
 name: 抓取原始資料
 
-# GitHub 只負責「抓」：跑 analyze/fetch_v2.py 抓測站與預報、做空間分析，
-# 寫成 data/v2/<stamp>.json 後 push。判讀由 Claude 讀 data/ 之後另外做。
-# 這裡不產生報告，也不觸發部署（deploy.yml 的 paths 不含 data/）。
-# 2026-09-21 起不再排程：環境白名單放寬後，Claude session 自己就連得到氣象署，
-# 抓取與判讀合併在同一端完成。這支保留作備援 —— Claude 端連續失敗時，
-# 到 Actions 手動 Run workflow 仍可產生快照。
+# 備援用，不排程。正常情況下抓取與判讀都在 Claude session 內完成。
+# 2026-09-21 起：環境白名單放寬後 Claude 自己就連得到氣象署，這支因此退為備援。
+# Claude 端連續失敗時，到 Actions 手動 Run workflow 可產生一筆快照
+# （只寫 data/v2/，不產生報告，也不觸發部署）。
 on:
   workflow_dispatch:
 
