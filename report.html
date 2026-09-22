@@ -87,8 +87,8 @@ a:hover{border-bottom-color:var(--cyan)}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <header><p class="eyebrow">Weatherboard · 空間判讀</p>
-<h1>北部七地雨情判讀</h1><p class="sub"><b>09/22 至 15:40 七地零降雨</b>,45 站本日累積全為 0.0 mm。本報告七地<b>無任何生效中的降雨特報</b>。</p><div class="meta">
-<span class="chip">觀測時刻 <b>2026-09-22 15:40 TST</b></span>
+<h1>北部七地雨情判讀</h1><p class="sub"><b>09/22 至 17:20 七地零降雨</b>,45 站本日累積全為 0.0 mm。未來三日高溫回到 31–33°C,<b>09/29–30 是這段乾期可能的轉折</b>。</p><div class="meta">
+<span class="chip">觀測時刻 <b>2026-09-22 17:20 TST</b></span>
 <span class="chip">測站 <b>45 / 47 · 氣象署 API</b></span>
 <span class="chip">七地有雨站 <b>0</b></span>
 <span class="chip">抓取 <b>Claude 直連</b></span>
@@ -162,15 +162,15 @@ a:hover{border-bottom-color:var(--cyan)}
 </div>
 </div>
 <h2>判讀</h2>
-<div class="conflict"><h3>① 09/22 至 15:40 零降雨 <span class="verdict v-ok">確認無雨</span></h3>
-<p>七地環域站數分別是 12、12、14、8、8、4、4,合計 62 站次,<b>全部回報 0.0 mm</b>。上一輪新竹與竹北因成德中學缺測各降為 3 站,<b>本輪已回補,七地環域都恢復完整</b>。環域站數都大於 0,代表每一地都有實際測站在回報:這是「0 / N」——N 站確認無雨;<b>與「env_n = 0」(查無資料)意思相反</b>,本次七地皆屬前者。</p>
-<p>本日累積(<span class="m">RainfallElement.Now</span>)在 45 站全為 0.0 mm,意思是<b>09/22 00:00 起到 15:40 為止,取得到的站沒有任何一站錄到降雨。</b></p>
-<p class="call"><b>判讀</b>七地今日至 15:40 沒有降雨,依據是 62 站次完整環域的實測。本區目前也沒有任何生效中的特報。</p>
+<div class="conflict"><h3>① 09/22 至 17:20 零降雨 <span class="verdict v-ok">確認無雨</span></h3>
+<p>七地環域站數分別是 12、12、14、8、8、4、4,合計 62 站次,<b>全部回報 0.0 mm</b>。每一地都有實際測站在回報,所以這是<b>確認沒下雨</b>,不是查不到資料。</p>
+<p>本日累積在 45 站全為 0.0 mm —— <b>09/22 00:00 起到 17:20 為止,沒有任何一站錄到降雨</b>。</p>
+<p class="call"><b>判讀</b>七地今日至 17:20 沒有降雨,依據是 62 站次完整環域的實測,不是預報。本區目前也沒有任何降雨相關的特報。</p>
 </div>
-<div class="conflict"><h3>② 夜間 21:40–07:40 沒有觀測覆蓋 <span class="verdict v-ok">跨時間比對</span></h3>
-<p>09/21 共九筆快照(00:30 至 21:40 觀測),全站網本日累積始終為 0.0 mm。但排程最後一輪在 21:40,<b>21:40 到午夜這兩小時二十分沒有快照覆蓋</b>,而 <span class="m">now</span> 跨日會歸零,事後無法回補。因此嚴謹的說法是「09/21 00:00–21:40 經 47 站確認無降雨」,而不是「整日無雨」。</p>
-<p>09/22 今日已累積四筆快照(07:40、09:40、11:40 觀測,加 00:00 起的累積值),本日累積始終為 0。兩日之間那段夜間空窗仍是<b>未觀測</b>,不是已確認無雨。</p>
-<p class="call"><b>判讀</b>時間上的缺口與空間上的缺測站一樣,不補、不外推。排程每兩小時一輪,夜間 22:00–07:00 本來就沒有覆蓋,報告不宜宣稱跨夜無雨。</p>
+<div class="conflict"><h3>② 明後天高溫回升到 31–33°C <span class="verdict v-ok">回溫</span></h3>
+<p>今日(09/22)台北 23–26°C,是這段期間最涼的一天;09/23 起高溫回到 31°C,09/25–09/28 北北四區可達 <b>33–34°C</b>。</p>
+<p><b>新竹與竹北的高溫比北北低 2–3°C</b>(09/25 起 30–31°C vs 33°C),低溫則相近,日夜溫差較小。</p>
+<p class="call"><b>判讀</b>接下來幾天日夜溫差約 10°C(早上 22°C、午後 33°C),早晚要加件外套。高溫日配合零降雨,體感會明顯偏熱。</p>
 </div>
 <div class="conflict"><h3>③ 09/30 的 46.9 mm 不可當量級引用 <span class="verdict v-ok">低雨量期</span></h3>
 <p>本次(15:51 取得)九天逐日雨量<b>與前四版逐值完全相同</b>,連續五輪未改寫。09/30 維持台北 46.9、板橋中和 43.8、土城樹林 32.0、新竹竹北 13.4 mm;09/29 維持台北 6.4。</p>
@@ -186,7 +186,7 @@ a:hover{border-bottom-color:var(--cyan)}
 <th>新竹 / 竹北</th>
 <th>備註</th>
 </tr></thead><tbody>
-<tr><td>09/22 今日</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">實測 45 站本日累積至 15:40 全 0;PoP 七地 0%;<b>本區無生效中特報</b></td></tr>
+<tr><td>09/22 今日</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">實測 45 站本日累積至 17:20 全 0;PoP 七地 0%</td></tr>
 <tr><td>09/23</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">無雨</td></tr>
 <tr><td>09/24</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">無雨</td></tr>
 <tr><td>09/25</td><td>0.9</td><td>0.8 / 0.8</td><td>0.5 / 0.5</td><td>0.6 / 0.6</td><td class="g">微量;昨晚版台北為 2.2</td></tr>
@@ -196,11 +196,28 @@ a:hover{border-bottom-color:var(--cyan)}
 <tr><td>09/29</td><td><b>6.4</b></td><td>4.6 / 4.6</td><td>3.5 / 3.5</td><td>0.5 / 0.5</td><td class="g">昨晚版台北為 3.4,本版再升;第 8 天,量級不可用</td></tr>
 <tr><td>09/30</td><td><b>46.9</b></td><td><b>43.8 / 43.8</b></td><td><b>32.0 / 32.0</b></td><td>13.4 / 13.4</td><td class="g"><b>昨晚版此日七地全為 0</b>,10 小時內改成 46.9——第 9 天,只看方向不看量</td></tr>
 </tbody></table></div>
+<h2>未來 8 天氣溫（yr.no 逐日最低 – 最高 °C）</h2><div class="scroll"><table><thead><tr>
+<th>日期</th>
+<th>台北市</th>
+<th>新北四區</th>
+<th>新竹 / 竹北</th>
+<th>備註</th>
+</tr></thead><tbody>
+<tr><td>09/22</td><td>23 – 26</td><td>23 – 27</td><td>24 – 28</td><td class="g">今日,傍晚後降溫</td></tr>
+<tr><td>09/23</td><td>21 – 31</td><td>21 – 31</td><td>23 – 31</td><td class="g">晴朗穩定,日夜溫差約 10°C</td></tr>
+<tr><td>09/24</td><td>22 – 32</td><td>22 – 33</td><td>22 – 31</td><td class="g">晴朗穩定,日夜溫差約 10°C</td></tr>
+<tr><td>09/25</td><td>23 – 33</td><td>22 – 33</td><td>22 – 30</td><td class="g">晴朗穩定,日夜溫差約 10°C</td></tr>
+<tr><td>09/26</td><td>23 – 32</td><td>23 – 33</td><td>23 – 30</td><td class="g">降雨 2.0 mm,溫度可能偏低</td></tr>
+<tr><td>09/27</td><td>22 – 33</td><td>22 – 33</td><td>22 – 30</td><td class="g">晴朗穩定,日夜溫差約 10°C</td></tr>
+<tr><td>09/28</td><td>22 – 34</td><td>22 – 35</td><td>23 – 31</td><td class="g">晴朗穩定,日夜溫差約 10°C</td></tr>
+<tr><td>09/29</td><td>25 – 31</td><td>25 – 32</td><td>24 – 34</td><td class="g">降雨 6.4 mm,溫度可能偏低</td></tr>
+</tbody></table></div>
 <h2>資料來源與方法</h2><div class="note">
 抓取、分析、判讀、產生報告<b>都在 Claude session 內完成</b>,GitHub 只負責部署。<ul>
 <li><b>數值語意</b>:卡片上的 mm 是<b>本日累積雨量</b>(<span class="m">RainfallElement.Now</span>),不是瞬時或時雨量。</li>
 <li><b>缺測據實排除</b>:本輪 <span class="m">01A210</span>(大豹)、<span class="m">01AG10</span>(熊空山)未取得,以 45 站計算,不以 0 補、不以鄰站內插。</li>
-<li><b>環域半徑 9 km</b>,七地合計 62 站次。「0 / N」是 N 站確認無雨;「env_n = 0」才是查無資料。本次七地皆屬前者。</li>
+<li><b>環域半徑 9 km</b>,七地合計 62 站次。「0 / N」代表 N 站都確認無雨。</li>
 <li>缺漏一律標「未取得」,不以鄰區數值代填、不內插、不編造。</li>
+<li><b>氣溫來源</b>:yr.no 逐日最低／最高溫(<span class="m">dayIntervals.temperature</span>);氣象署鄉鎮 3 小時氣溫另存於快照。兩者皆為預報值,非實測。</li>
 </ul></div>
 <footer>資料收集 · 判讀 by Claude ｜ 部署 by GitHub Pages<br>來源:中央氣象署開放資料 API(雨量站、鄉鎮 3 小時 PoP、特報)、yr.no（MET Norway／ECMWF）</footer></div></body></html>
