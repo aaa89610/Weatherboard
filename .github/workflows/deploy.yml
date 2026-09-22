@@ -1,11 +1,11 @@
 name: 部署看板
 
-# GitHub 只負責部署:資料抓取與分析在 Claude session 內完成後 push,
-# 這裡收到 push 就把當前內容發布到 GitHub Pages。
+# GitHub 只負責部署：抓取、分析、判讀都在 Claude session 內完成後 push，
+# 這裡收到 push 就把當前內容發布到 GitHub Pages。排程不在這裡，在 Claude 端。
 on:
   push:
     branches: [main]
-    # 只有看板本身變動才部署;抓取 job 推的原始快照不需要重新發布
+    # 只有看板本身變動才部署；data/ 底下的原始快照不需要重新發布
     paths: ['report.html', 'index.html', 'data.json', 'template.html', '.nojekyll']
   workflow_dispatch:
 
