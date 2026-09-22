@@ -145,22 +145,33 @@ def render(r):
         P.append(f'<span class="chip">{e(k)} <b>{e(v)}</b></span>')
     P.append('</div></header>')
 
+    # 降雨相關的特報類型。強風、長浪、高溫等與本看板無關，不進版面。
+    RAIN_KINDS = ('雨', '颱風')
+
+    def _keep(a):
+        """特報要同時滿足：涵蓋本區七地，且與降雨有關。
+
+        areas_ours 是判讀端從快照算出來的實際縣市命中清單，空的就代表不涵蓋本區。
+        把條件放在版型層而不是靠判讀端記得，因為「不涵蓋本區」的特報
+        連續三輪都被寫進報告，佔掉最大版面卻不影響任何決定。
+        """
+        if a.get('always'):
+            return True                       # 資料過舊橫幅等系統訊息
+        if not a.get('areas_ours'):
+            return False
+        text = f"{a.get('tag', '')} {a.get('title', '')}"
+        return any(k in text for k in RAIN_KINDS)
+
     stale = _staleness(r)
-    for a in ([stale] if stale else []) + r.get('alerts', []):
+    if stale:
+        stale['always'] = True
+    for a in ([stale] if stale else []) + [x for x in r.get('alerts', []) if _keep(x)]:
         cls = 'alert amber' if a.get('level') == 'amber' else 'alert'
         P.append(f'<div class="{cls}"><span class="tag">{e(a["tag"])}</span>'
                  f'<h3>{e(a["title"])}</h3><p>{_rich(a["body"])}</p></div>')
 
-    if r.get('terrain'):
-        t = r['terrain']
-        P.append(f'<div class="banner"><span class="tag">{e(t["tag"])}</span><h3>{e(t["title"])}</h3>')
-        P.append('<div class="nums">')
-        for lbl, val in t['nums']:
-            P.append(f'<div>{e(lbl)}<b>{e(val)}</b></div>')
-        P.append('</div>')
-        for p in t['paras']:
-            P.append(f'<p>{_rich(p)}</p>')
-        P.append('</div>')
+    # 2026-09-22 起不再渲染 terrain 區塊：全區無雨時它只是在解釋「沒事發生」，
+    # 佔掉版面卻不影響任何決定。地形分離真的觸發時，由判讀端寫進 findings。
 
     if r.get('locations'):
         P.append(f'<h2>{e(r.get("loc_heading","各地實測"))}</h2><div class="grid">')
