@@ -1,30 +1,29 @@
 #!/usr/bin/env python3
 """本機更新的固定步驟。判讀（改寫 report.json）夾在 prepare 與 publish 之間，
-由 Claude 本機排程負責；這支只做不需要判斷的部分。
+由 Claude 本機排程負責；這支只做不需要判斷的部分。全部在本機完成，不連 GitHub。
 
     .venv\\Scripts\\python.exe analyze\\local_update.py prepare
     .venv\\Scripts\\python.exe analyze\\local_update.py digest
     .venv\\Scripts\\python.exe analyze\\local_update.py publish -F <commit 訊息檔>
 
-prepare  git pull → fetch_v2.py 抓取 → load.py --check
-         結束碼 0：有新快照，要判讀；1：沒有新資料，跳過；2：pull 或抓取失敗
+prepare  fetch_v2.py 抓取 → load.py --check
+         結束碼 0：有新快照，要判讀；1：沒有新資料，跳過；2：抓取失敗
 digest   印出 load.py 的跨時間摘要（UTF-8，Windows 主控台不會亂碼）
-publish  render.py → 只 commit report.json / report.html → push
-         結束碼 0：完成或沒有變更；3：push 失敗（commit 留在本機，下次一起推）
+publish  render.py 產生 report.html → 在本機 git commit report.json / report.html
+         結束碼 0：完成或沒有變更；2：render 或 commit 失敗
 
-data/ 與 history/ 在 .gitignore 裡，只存在本機，這支不會把它們加進 commit。
-commit 一律用 Weatherboard Bot 的 noreply 身分，不帶出本機的 git 帳號與信箱。
+報告直接用瀏覽器開 report.html。每一版報告與判讀紀錄（commit 訊息）都留在本機 git，
+下一輪判讀靠 `git log` 延續判準。data/ 與 history/ 直接存在本機磁碟，不進 git。
 """
 import argparse, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 SITE = ['report.json', 'report.html']
-BOT = ['-c', 'user.name=Weatherboard Bot', '-c', 'user.email=aaa89610@users.noreply.github.com']
+BOT = ['-c', 'user.name=Weatherboard Bot', '-c', 'user.email=weatherboard@localhost']
 
-# 子程序一律 UTF-8；git 憑證缺失時立刻失敗，不要在排程裡卡在登入視窗
-ENV = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8',
-           GCM_INTERACTIVE='never', GIT_TERMINAL_PROMPT='0')
+# 子程序一律 UTF-8
+ENV = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
 
 
 def run(args):
@@ -37,9 +36,6 @@ def git(*args):
 
 
 def prepare():
-    if git('pull', '--rebase', '--autostash', 'origin', 'main'):
-        print('git pull 失敗，本次不更新。')
-        return 2
     if run([PY, os.path.join('analyze', 'fetch_v2.py')]):
         print('抓取失敗（一站都沒抓到），本次不更新。')
         return 2
@@ -61,13 +57,8 @@ def publish(message, message_file):
     msg = ['-F', message_file] if message_file else ['-m', message]
     if git(*BOT, 'commit', *msg):
         return 2
-    for _ in range(2):
-        if git('push', 'origin', 'main') == 0:
-            return 0
-        git('pull', '--rebase', 'origin', 'main')
-    print('push 失敗：commit 已留在本機，下次 publish 會一起推上去。'
-          '若是憑證問題，請在終端機手動執行一次 git push 完成 GitHub 登入。')
-    return 3
+    print(f"報告已更新：{os.path.join(ROOT, 'report.html')}")
+    return 0
 
 
 if __name__ == '__main__':
