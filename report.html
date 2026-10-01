@@ -63,9 +63,17 @@ h2{font-size:12px;font-family:var(--mono);letter-spacing:.2em;text-transform:upp
 .v-ok{background:rgba(74,222,128,.14);color:var(--green)}
 .conflict p{margin:0 0 9px;color:var(--dim);font-size:14px}
 .conflict p:last-child{margin-bottom:0}
-.conflict .call{color:var(--ink);border-top:1px dashed var(--line);padding-top:9px;margin-top:11px}
-.conflict .call b{color:var(--cyan);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
- text-transform:uppercase;display:block;margin-bottom:3px;font-weight:700}
+.conflict .call{color:var(--ink);font-size:15.5px;line-height:1.7;margin:0}
+.conflict .call b{color:var(--cyan);font-weight:650}
+.more{margin-top:12px;border-top:1px dashed var(--line);padding-top:9px}
+.more summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:7px;
+ color:var(--faint);font-family:var(--mono);font-size:12px;letter-spacing:.06em;user-select:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"";border-left:6px solid currentColor;border-top:4px solid transparent;
+ border-bottom:4px solid transparent;transition:transform .15s}
+.more[open] summary::before{transform:rotate(90deg)}
+.more summary:hover,.more summary:focus-visible{color:var(--ink)}
+.more p{margin:10px 0 0}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
 th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -161,27 +169,20 @@ a:hover{border-bottom-color:var(--cyan)}
 </div>
 <h2>判讀</h2>
 <div class="conflict"><h3>① 今天到 09:57 零降雨，剩餘時段也幾乎不會下 <span class="verdict v-ok">確認無雨</span></h3>
-<p>七地環域 12、12、14、8、8、4、4 共 62 站次，<b>全部 0.0 mm</b>；10 分鐘與 1 小時雨量也都是 0。氣象署逐時預報今日剩餘時段北部五地<b>20%</b>、新竹竹北<b>0%</b>，到明早 08 時都沒有降雨的天氣描述（晴到多雲）。</p>
-<p>今天仍是這週最熱的一天，但兩個來源對台北差了 3 度：氣象署逐時給<b>台北 36、板橋 34、新竹 31°C</b>，yr.no 給台北 33、板橋 35、新竹 31°C。北部落在 33 到 36 之間，新竹兩邊都是 31。</p>
-<p class="call"><b>判讀</b><b>今天不用帶傘，防曬照最高標準。</b></p>
+<p class="call"><b>今天不用帶傘，防曬照最高標準。</b></p>
+<details class="more"><summary>詳細說明</summary><p>七地環域 12、12、14、8、8、4、4 共 62 站次，<b>全部 0.0 mm</b>；10 分鐘與 1 小時雨量也都是 0。氣象署逐時預報今日剩餘時段北部五地<b>20%</b>、新竹竹北<b>0%</b>，到明早 08 時都沒有降雨的天氣描述（晴到多雲）。</p><p>今天仍是這週最熱的一天，但兩個來源對台北差了 3 度：氣象署逐時給<b>台北 36、板橋 34、新竹 31°C</b>，yr.no 給台北 33、板橋 35、新竹 31°C。北部落在 33 到 36 之間，新竹兩邊都是 31。</p></details>
 </div>
 <div class="conflict"><h3>② 週五六那波又回來了，同一把尺量出來是「帶傘」 <span class="verdict v-scale">帶傘</span></h3>
-<p>北部兩日合計：<b>台北 21.3、板橋中和 11.6、土城樹林 10.6 mm</b>，新竹竹北 5.6 mm。三段判準（30 以上挪行程／15 到 30 帶傘／低於 15 不追蹤）套在北部最大值上，21.3 落在<b>中間段</b>。</p>
-<p>09/29 中午這組數字掉到 4.7 到 5.8、當時撤除了追蹤；現在回到 10.6 到 21.3。同樣這兩天的數字，這是<b>第四次大幅改向</b>（4.7–9.0 → 31.3–38.8 → 12.4–20.8 → 4.7–5.8 → 10.6–21.3）。中間近兩天沒有新資料，不知道它途中怎麼走，只知道起點和現在。</p>
-<p>雨偏台北：只有台北超過 15，板橋中和、土城樹林都在 11 上下，新竹竹北兩天加起來不到 6 mm。另外氣象署逐時預報明天清晨到 08 時都還是晴，要下也是週五白天以後。</p>
-<p class="call"><b>判讀</b><b>週五（10/02）、週六（10/03）帶傘，行程不用動。</b>台北這兩天各約 10 mm，是會濕鞋的量；新竹竹北帶把折傘就夠。</p>
+<p class="call"><b>週五（10/02）、週六（10/03）帶傘，行程不用動。</b>台北這兩天各約 10 mm，是會濕鞋的量；新竹竹北帶把折傘就夠。</p>
+<details class="more"><summary>詳細說明</summary><p>北部兩日合計：<b>台北 21.3、板橋中和 11.6、土城樹林 10.6 mm</b>，新竹竹北 5.6 mm。三段判準（30 以上挪行程／15 到 30 帶傘／低於 15 不追蹤）套在北部最大值上，21.3 落在<b>中間段</b>。</p><p>09/29 中午這組數字掉到 4.7 到 5.8、當時撤除了追蹤；現在回到 10.6 到 21.3。同樣這兩天的數字，這是<b>第四次大幅改向</b>（4.7–9.0 → 31.3–38.8 → 12.4–20.8 → 4.7–5.8 → 10.6–21.3）。中間近兩天沒有新資料，不知道它途中怎麼走，只知道起點和現在。</p><p>雨偏台北：只有台北超過 15，板橋中和、土城樹林都在 11 上下，新竹竹北兩天加起來不到 6 mm。另外氣象署逐時預報明天清晨到 08 時都還是晴，要下也是週五白天以後。</p></details>
 </div>
 <div class="conflict"><h3>③ 10/05 那波縮回去了，但照規矩明天才下結論 <span class="verdict v-ok">明天再判</span></h3>
-<p><b>10/05（一）台北 19.9 → 3.4、板橋中和 13.4 → 1.3、土城樹林 14.4 → 6.0、新竹竹北 10.5 → 1.9 mm</b>。09/29 那個「七地第一次一起超過 10 mm」已經不成立。</p>
-<p>09/29 寫下的時程是：10/05 要等<b>週五（10/02）那一版</b>、進到 3 天內才用三段判準判。當時沒有因為數字變大就提前加碼，今天同樣<b>不因為數字變小就提前撤除</b>——規則兩個方向都要守。</p>
-<p>它今天在第 4 天。週五六那組數字剛示範過：兩天內可以從 5.8 回到 21.3。</p>
-<p class="call"><b>判讀</b><b>下週一照常安排就好。</b>明天那版會用同一把尺給明確結論。</p>
+<p class="call"><b>下週一照常安排就好。</b>明天那版會用同一把尺給明確結論。</p>
+<details class="more"><summary>詳細說明</summary><p><b>10/05（一）台北 19.9 → 3.4、板橋中和 13.4 → 1.3、土城樹林 14.4 → 6.0、新竹竹北 10.5 → 1.9 mm</b>。09/29 那個「七地第一次一起超過 10 mm」已經不成立。</p><p>09/29 寫下的時程是：10/05 要等<b>週五（10/02）那一版</b>、進到 3 天內才用三段判準判。當時沒有因為數字變大就提前加碼，今天同樣<b>不因為數字變小就提前撤除</b>——規則兩個方向都要守。</p><p>它今天在第 4 天。週五六那組數字剛示範過：兩天內可以從 5.8 回到 21.3。</p></details>
 </div>
 <div class="conflict"><h3>④ 降溫的形狀變了：週六先降、週日回熱，週二才真正涼 <span class="verdict v-scale">留意變化</span></h3>
-<p>台北逐日高溫：<b>今天 33（氣象署 36）、10/02 30、10/03 28、10/04 31、10/05 28、10/06 24°C</b>。09/29 的版本是「這週都在 31 以上、下週一一次降到 26」，這版改成<b>週六先掉到 28、週日回到 31、週二才到 24</b>。</p>
-<p>週六那天降溫跟雨落在同一天，雨和溫又是一起動，屬於同一個系統的兩面，不是兩個獨立證據。10/06 的 24°C 在第 5 天，只記錄，不改建議。</p>
-<p><b>新竹竹北這兩天反而比北部熱</b>：週五新竹 32、台北 30；週六新竹 31、台北 28。平常新竹高溫比北北低 2 到 3°C，這次因為雨落在北部而倒過來。</p>
-<p class="call"><b>判讀</b><b>週日（10/04）還要防曬。</b>換季的衣服等下週二的數字進到 3 天內再說；去新竹的人週五六別以為會比較涼。</p>
+<p class="call"><b>週日（10/04）還要防曬。</b>換季的衣服等下週二的數字進到 3 天內再說；去新竹的人週五六別以為會比較涼。</p>
+<details class="more"><summary>詳細說明</summary><p>台北逐日高溫：<b>今天 33（氣象署 36）、10/02 30、10/03 28、10/04 31、10/05 28、10/06 24°C</b>。09/29 的版本是「這週都在 31 以上、下週一一次降到 26」，這版改成<b>週六先掉到 28、週日回到 31、週二才到 24</b>。</p><p>週六那天降溫跟雨落在同一天，雨和溫又是一起動，屬於同一個系統的兩面，不是兩個獨立證據。10/06 的 24°C 在第 5 天，只記錄，不改建議。</p><p><b>新竹竹北這兩天反而比北部熱</b>：週五新竹 32、台北 30；週六新竹 31、台北 28。平常新竹高溫比北北低 2 到 3°C，這次因為雨落在北部而倒過來。</p></details>
 </div>
 <h2>未來 9 天（yr.no 日雨量 mm · 10/01 09:57 取得）</h2><div class="scroll"><table><thead><tr>
 <th>日期</th>

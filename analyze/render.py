@@ -70,9 +70,17 @@ h2{font-size:12px;font-family:var(--mono);letter-spacing:.2em;text-transform:upp
 .v-ok{background:rgba(74,222,128,.14);color:var(--green)}
 .conflict p{margin:0 0 9px;color:var(--dim);font-size:14px}
 .conflict p:last-child{margin-bottom:0}
-.conflict .call{color:var(--ink);border-top:1px dashed var(--line);padding-top:9px;margin-top:11px}
-.conflict .call b{color:var(--cyan);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
- text-transform:uppercase;display:block;margin-bottom:3px;font-weight:700}
+.conflict .call{color:var(--ink);font-size:15.5px;line-height:1.7;margin:0}
+.conflict .call b{color:var(--cyan);font-weight:650}
+.more{margin-top:12px;border-top:1px dashed var(--line);padding-top:9px}
+.more summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:7px;
+ color:var(--faint);font-family:var(--mono);font-size:12px;letter-spacing:.06em;user-select:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"";border-left:6px solid currentColor;border-top:4px solid transparent;
+ border-bottom:4px solid transparent;transition:transform .15s}
+.more[open] summary::before{transform:rotate(90deg)}
+.more summary:hover,.more summary:focus-visible{color:var(--ink)}
+.more p{margin:10px 0 0}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
 th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -193,10 +201,15 @@ def render(r):
         for f in r['findings']:
             P.append(f'<div class="conflict"><h3>{e(f["title"])} '
                      f'<span class="verdict {e(f.get("cls","v-scale"))}">{e(f["verdict"])}</span></h3>')
-            for p in f.get('paras', []):
-                P.append(f'<p>{_rich(p)}</p>')
+            # 結論（call）是卡片主文；推論過程（paras）收進可展開的「詳細說明」
+            paras = [f'<p>{_rich(p)}</p>' for p in f.get('paras', [])]
             if f.get('call'):
-                P.append(f'<p class="call"><b>判讀</b>{_rich(f["call"])}</p>')
+                P.append(f'<p class="call">{_rich(f["call"])}</p>')
+                if paras:
+                    P.append('<details class="more"><summary>詳細說明</summary>'
+                             + ''.join(paras) + '</details>')
+            else:
+                P.extend(paras)
             P.append('</div>')
 
     if r.get('outlook'):
