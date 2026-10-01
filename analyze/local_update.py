@@ -120,6 +120,13 @@ def check():
         if exp != got:
             errs.append(f'氣溫表 {md}：應為 {exp}，寫成 {got}')
 
+    # 氣象署逐時「有降雨描述」的地區逐地列出：判讀提到地區時常漏掉其中幾地（例如中和）
+    for loc, hrs in (snap.get('forecasts', {}).get('cwa_pop', {}).get('by_loc') or {}).items():
+        wet = [h for h in hrs if '雨' in (h.get('wx') or '') or (h.get('pop') or 0) >= 30]
+        if wet:
+            spans = '、'.join(f"{h['date']} {h['hour']:02d}時 {h['wx']} {h['pop']}%" for h in wet)
+            warns.append(f'氣象署逐時有降雨描述：{loc} {spans}（內文提到地區時請逐地對照）')
+
     n = len(rep.get('findings', []))
     if not 3 <= n <= 5:
         errs.append(f'判讀 {n} 條，應為 3–5 條')
