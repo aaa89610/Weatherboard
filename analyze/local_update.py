@@ -4,11 +4,14 @@
 
     .venv\\Scripts\\python.exe analyze\\local_update.py prepare
     .venv\\Scripts\\python.exe analyze\\local_update.py digest
+    .venv\\Scripts\\python.exe analyze\\local_update.py check
     .venv\\Scripts\\python.exe analyze\\local_update.py publish -F <commit 訊息檔>
 
 prepare  git pull → fetch_v2.py 抓取 → load.py --check
          結束碼 0：有新快照，要判讀；1：沒有新資料，跳過；2：pull 或抓取失敗
 digest   印出 load.py 的跨時間摘要，並附上前 3 輪判讀紀錄（UTF-8，Windows 主控台不會亂碼）
+check    查核 report.json：兩張表逐格對照最新快照、星期、判讀條數、HTML 實體、render 結果
+         結束碼 0：通過；1：有錯誤（逐項列出）
 publish  render.py → 本機 commit report.json / report.html → push 到 GitHub（觸發 Pages 部署）
          結束碼 0：完成或沒有變更；2：render 或 commit 失敗；
          3：push 失敗（commit 留在本機，下次一起推）
@@ -58,6 +61,111 @@ def digest():
     return rc
 
 
+LOC_COLS = [('台北市',), ('板橋區', '中和區'), ('土城區', '樹林區'), ('新竹市', '竹北市')]
+TEMP_COLS = ['台北市', '板橋區', '新竹市']          # 新北四區以板橋為代表；新竹與竹北合併一欄
+
+
+def _round(x):
+    from decimal import Decimal, ROUND_HALF_UP
+    return int(Decimal(str(x)).quantize(Decimal('1'), ROUND_HALF_UP))
+
+
+def check():
+    """查核 report.json 與最新快照是否一致。每次判讀後必跑，免得排程自己臨時寫檢查程式。
+
+    錯誤（結束碼 1）：source_stamp、兩張表逐格數值、星期、判讀條數、HTML 實體、render 結果。
+    提醒（不算錯）：上一版報告的時刻仍出現在內文——若是刻意對照可以保留。
+    """
+    import datetime as dt, glob, json, re
+    sys.path.insert(0, os.path.join(ROOT, 'analyze'))
+    import render
+
+    snaps = sorted(glob.glob(os.path.join(ROOT, 'data', 'v2', '2*.json')))
+    snap = json.load(open(snaps[-1], encoding='utf-8'))
+    rep = json.load(open(os.path.join(ROOT, 'report.json'), encoding='utf-8'))
+    yr = snap['forecasts']['yr']
+    errs, warns = [], []
+    wd = '一二三四五六日'
+    strip = lambda c: re.sub(r'</?b>', '', c).strip()
+    mm = lambda v: '0' if v == 0 else f'{v:.1f}'
+
+    if rep.get('source_stamp') != snap['stamp']:
+        errs.append(f"source_stamp 是 {rep.get('source_stamp')}，最新快照是 {snap['stamp']}")
+
+    def date_ok(label, where):
+        md, w = label.split()
+        d = dt.date(int(snap['stamp'][:4]), int(md[:2]), int(md[3:]))
+        if wd[d.weekday()] != w:
+            errs.append(f'{where} {md} 星期應為「{wd[d.weekday()]}」，寫成「{w}」')
+        return md
+
+    for row in rep.get('outlook', {}).get('rows', []):
+        md = date_ok(row[0], '雨量表')
+        try:
+            exp = [' / '.join(mm(yr['by_loc'][l][md]) for l in grp) for grp in LOC_COLS]
+        except KeyError:
+            errs.append(f'雨量表 {md}：快照裡沒有這一天'); continue
+        got = [strip(c) for c in row[1:5]]
+        if exp != got:
+            errs.append(f'雨量表 {md}：應為 {exp}，寫成 {got}')
+
+    t = yr.get('temp_c', {})
+    for row in rep.get('outlook_extra', {}).get('rows', []):
+        md = date_ok(row[0], '氣溫表')
+        try:
+            exp = [f"{_round(t[l][md]['min'])} – {_round(t[l][md]['max'])}" for l in TEMP_COLS]
+        except KeyError:
+            errs.append(f'氣溫表 {md}：快照裡沒有這一天'); continue
+        got = [strip(c) for c in row[1:4]]
+        if exp != got:
+            errs.append(f'氣溫表 {md}：應為 {exp}，寫成 {got}')
+
+    n = len(rep.get('findings', []))
+    if not 3 <= n <= 5:
+        errs.append(f'判讀 {n} 條，應為 3–5 條')
+    for f in rep.get('findings', []):
+        if not f.get('call'):
+            errs.append(f"判讀「{f.get('title', '')}」沒有 call（卡片主文）")
+    if 'terrain' in rep:
+        errs.append('report.json 不要放 terrain 欄位')
+
+    text = json.dumps(rep, ensure_ascii=False)
+    ents = sorted(set(re.findall(r'&[a-zA-Z#0-9]+;', text)))
+    if ents:
+        errs.append(f'內文有 HTML 實體 {ents}，請改成中文字')
+
+    try:
+        prev = json.loads(subprocess.run(['git', 'show', 'HEAD:report.json'], cwd=ROOT,
+                                         capture_output=True, env=ENV).stdout.decode('utf-8'))
+        pst = prev.get('source_stamp', '')
+        old_times = {pst[11:16]} | set(re.findall(r'\d\d:\d\d', ' '.join(map(str, prev.get('chips', [])))))
+        for tm in sorted(x for x in old_times if x):
+            for m in re.finditer(re.escape(tm), text):
+                warns.append(f'上一版的時刻 {tm} 仍出現：…{text[max(0, m.start() - 25):m.end() + 15]}…')
+    except Exception as e:                                   # noqa: BLE001
+        warns.append(f'讀不到上一版報告，跳過舊時刻掃描（{type(e).__name__}）')
+
+    html = render.render(rep)
+    preview = os.path.join(os.environ.get('TEMP', ROOT), 'weatherboard_preview.html')
+    open(preview, 'w', encoding='utf-8').write(html)
+    if html.count('<table') != 2:
+        errs.append(f"render 後表格 {html.count('<table')} 張，應為 2 張")
+    if '&lt;' in html:
+        errs.append('render 後出現被跳脫的標記（只接受 <b> <br> <m>）')
+
+    counts = {k: html.count(v) for k, v in
+              (('表格', '<table'), ('特報', 'class="alert'), ('詳細說明', 'class="more"'), ('過舊橫幅', '資料非即時'))}
+    rows = (len(rep.get('outlook', {}).get('rows', [])), len(rep.get('outlook_extra', {}).get('rows', [])))
+    print(f"快照 {os.path.basename(snaps[-1])}｜判讀 {n} 條｜雨量表 {rows[0]} 列｜氣溫表 {rows[1]} 列"
+          f"｜render：" + '、'.join(f'{k} {v}' for k, v in counts.items()) + f"｜預覽 {preview}")
+    for w in warns:
+        print('提醒：', w)
+    for e in errs:
+        print('錯誤：', e)
+    print('查核通過' if not errs else f'查核未通過：{len(errs)} 項錯誤，改完再跑一次')
+    return 0 if not errs else 1
+
+
 def publish(message, message_file):
     if run([PY, os.path.join('analyze', 'render.py'), 'report.json', 'report.html']):
         print('render.py 失敗，不 commit。')
@@ -86,6 +194,7 @@ if __name__ == '__main__':
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('prepare')
     sub.add_parser('digest')
+    sub.add_parser('check')
     p = sub.add_parser('publish')
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument('-m', dest='message')
@@ -95,4 +204,6 @@ if __name__ == '__main__':
         sys.exit(prepare())
     if a.cmd == 'digest':
         sys.exit(digest())
+    if a.cmd == 'check':
+        sys.exit(check())
     sys.exit(publish(a.message, a.message_file))
