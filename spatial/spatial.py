@@ -13,7 +13,7 @@
 import json, math, os
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-_S = json.load(open(os.path.join(BASE, 'stations.json')))
+_S = json.load(open(os.path.join(BASE, 'stations.json'), encoding='utf-8'))
 ST, LOC = _S['stations'], _S['locations']
 
 TERRAIN_HIGH = {'windward', 'hill'}      # 迎風面與山區

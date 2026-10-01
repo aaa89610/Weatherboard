@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """抓原始資料 → 跑空間分析 → 寫成 data/v2/<stamp>.json（schema: rain-snapshot/2）。
 
-在 GitHub Actions 的 runner 上執行（網路不受限）。不做任何判讀，
+在本機執行（由 analyze/local_update.py prepare 呼叫）。不做任何判讀，
 判讀由讀這份快照的人／模型負責。
+
+Windows 上要用 Python 3.12：3.13 起預設開啟 X509 嚴格驗證，
+氣象署的 TWCA 中繼憑證缺 Subject Key Identifier，會被拒絕連線。
 
 站碼對應：stations.json 用 6 碼，氣象署頁面歷史上出現過 5 碼，
 因此先試 6 碼再退 5 碼，並在 meta.station_match 記錄實際命中方式。
@@ -236,7 +239,7 @@ def main():
     snap = {
         'schema': 'rain-snapshot/2',
         'stamp': now.isoformat(timespec='minutes'),
-        'mode': 'actions+scrape',
+        'mode': ('actions' if os.environ.get('GITHUB_ACTIONS') else 'local') + '+' + meta.get('source', 'scrape'),
         'obs': {
             'time': meta['obs_time'],          # 該頁不提供時，為 None，不要猜
             # 頁面每 10 分鐘更新一次，所以實際觀測時刻落在 [fetched_at - 10min, fetched_at]。

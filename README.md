@@ -6,33 +6,36 @@
 
 ## 架構
 
-抓取、空間分析、判讀、產生報告都在 Claude session 內完成，GitHub 只負責部署。
+抓取、空間分析、判讀、產生報告都在**本機**完成，GitHub 只負責部署網頁。
+氣象資料（`data/`、`history/`）**只存在本機**，不在 repo 裡，也不會被發布。
 
 ```
-Claude Routine（每日四次，台灣時間 07:00、11:00、16:00、21:00）
-  → analyze/fetch_v2.py    抓 47 站與預報，跑空間分析，寫 data/v2/<stamp>.json
-  → analyze/load.py        讀 data/ 全部內容，跨時間比對
-  → 判讀（人／模型做，不寫成閾值）
-  → report.json → analyze/render.py → report.html
-  → git push main
+Claude 桌面版本機排程「Weatherboard 本機判讀」（每日 07:00、11:00、16:00、21:00）
+  → analyze/local_update.py prepare
+       git pull → fetch_v2.py 抓 47 站與預報、跑空間分析、寫 data/v2/<stamp>.json
+       → load.py --check（沒有新快照就結束）
+  → analyze/local_update.py digest   讀 data/ 全部內容，跨時間比對
+  → 判讀（模型做，不寫成閾值）→ 改寫 report.json
+  → analyze/local_update.py publish  render.py → commit report.json / report.html → push
        ↓
 GitHub Actions  deploy.yml
   → 發布到 GitHub Pages
 ```
 
-`.github/workflows/fetch.yml` 保留但**不排程**，僅供備援手動觸發。
+排程只在 Claude 桌面版開著時執行；到點時電腦關機或 App 沒開，會在下次開啟時補跑一次。
 
-2026-09-21 之前抓取跑在 Actions 上，因為當時 Claude session 的網路白名單擋住氣象署。
-白名單放寬後兩段合併，少一個跨平台交接，也不再受 GitHub 排程掉 tick 影響
-（實測 6 天只跑 20 次，設定為 48 次）。
+沿革：2026-09-21 之前抓取跑在 Actions 上（`fetch.yml`，實測 6 天只跑 20 次，設定為 48 次）；
+09-21 起改由雲端 Claude Routine 抓取＋判讀；2026-10-01 起整套搬到本機，
+`fetch.yml` 一併刪除，雲端 Routine 已停用。
 
 ## 目錄
 
 | 路徑 | 說明 |
 | --- | --- |
-| `data/v2/` | 固定 schema 快照，可跨時間比較 |
-| `analyze/fetch_v2.py` | 在 Actions 上抓測站與預報、跑空間分析、寫 v2 快照 |
-| `data/raw/` | 舊格式快照 22 筆（09/11–09/15），每筆 schema 不同，僅供淺層參考 |
+| `data/v2/` | 固定 schema 快照，可跨時間比較（**僅本機**） |
+| `data/raw/` | 舊格式快照 22 筆（09/11–09/15），每筆 schema 不同，僅供淺層參考（**僅本機**） |
+| `analyze/local_update.py` | 本機更新的固定步驟：`prepare` / `digest` / `publish` |
+| `analyze/fetch_v2.py` | 抓測站與預報、跑空間分析、寫 v2 快照 |
 | `spatial/` | 47 站表與空間分析模組（純函式：envelope／summarize／terrain_split／track） |
 | `analyze/load.py` | 讀 `data/` 全部內容，輸出跨時間摘要 |
 | `analyze/render.py` | `report.json` → `report.html` |
@@ -64,13 +67,13 @@ parser 2 起，**回報 0 的測站也會收進 `obs`**。
 
 ## 氣象署金鑰
 
-抓取優先走開放資料 API `O-A0002-001`，需要金鑰。金鑰存成 GitHub Actions secret
+抓取優先走開放資料 API `O-A0002-001`，需要金鑰。金鑰存成本機的使用者環境變數
 `CWA_KEY`，程式只從環境變數讀，**絕不寫進檔案**——這個 repo 是公開的。
 
-設定位置：Settings → Secrets and variables → Actions → New repository secret，
-名稱 `CWA_KEY`。
+設定方式（PowerShell，設完要重開 Claude 桌面版才讀得到）：
+`[Environment]::SetEnvironmentVariable('CWA_KEY', '<你的金鑰>', 'User')`
 
-沒有設 secret 也能運作：`fetch_v2.py` 會自動退回爬網頁，只是少了精確 `ObsTime`，
+沒有設金鑰也能運作：`fetch_v2.py` 會自動退回爬網頁，只是少了精確 `ObsTime`，
 且欄位語意得靠位置推斷。`meta.source` 記錄該次實際走哪條路
 （`opendata-api` 或 `scrape`），API 失敗時 `meta.api_error` 記錄原因，
 錯誤訊息中的金鑰會被遮成 `<KEY>`。
@@ -83,12 +86,12 @@ API 路徑另外會排除氣象署的缺測哨兵（負值如 -998），不與�
 
 判讀端的觸發條件是「**有沒有新快照**」，不是「資料夠不夠新」。
 
-`python3 analyze/load.py --check` 比對 `report.json` 的 `source_stamp` 與最新快照：
-有新資料回結束碼 0，沒有回 1。判讀端先跑這個，沒有新資料就立刻結束，不做分析。
+`analyze/load.py --check`（`local_update.py prepare` 的最後一步）比對 `report.json` 的
+`source_stamp` 與最新快照：有新資料回結束碼 0，沒有回 1。沒有新資料就立刻結束，不做分析。
 
-會這樣設計是因為上游排程不穩定：`fetch.yml` 設定每日 8 次，
+會這樣設計是因為當初上游排程不穩定：`fetch.yml` 設定每日 8 次，
 2026-09-15 至 09-21 實測只跑了 20 次（約 3.3 次／日），間隔 3.4–11.6 小時，
-全部 success —— GitHub 直接略過多數排程觸發，不是失敗。
+全部 success —— GitHub 直接略過多數排程觸發，不是失敗。本機排程也會因關機而延後，同樣適用。
 
 原先以「資料超過 180 分鐘就不要更新」當阻斷條件，結果判讀端每次醒來都放棄，
 報告連續五天沒更新。**資料舊不是不更新的理由，是要標示的事實**：
@@ -153,20 +156,36 @@ API 路徑另外會排除氣象署的缺測哨兵（負值如 -998），不與�
 ## 更新時間
 
 每日台灣時間 **07:00、11:00、16:00、21:00**，共四次。
-cron 以 UTC 表示為 `0 23,3,8,13 * * *`（台灣時間減 8 小時，07:00 落在前一日 23:00 UTC）。
+本機排程的 cron 用本機時區（台北）：`0 7,11,16,21 * * *`。
 
 夜間 21:00 到隔日 07:00 之間沒有觀測覆蓋，報告不得宣稱跨夜無雨。
 
 ## 首次設定
 
-Settings → Pages → Source 選 **GitHub Actions**（不是 Deploy from a branch）。
+GitHub：Settings → Pages → Source 選 **GitHub Actions**（不是 Deploy from a branch）。
+
+本機（Windows）：
+
+```powershell
+# 1. Python 環境。務必用 3.12：3.13 起的 X509 嚴格驗證會拒絕氣象署的 TWCA 憑證
+uv venv .venv --python 3.12
+uv pip install --python .venv\Scripts\python.exe requests pillow tzdata   # tzdata：Windows 的 zoneinfo 需要
+
+# 2. GitHub 登入（只需一次）：手動 push 一次，跳出的視窗用 repo 擁有者帳號登入
+git push origin main
+
+# 3. 手動跑一次確認
+.venv\Scripts\python.exe analyze\local_update.py prepare
+```
+
+排程本身在 Claude 桌面版的「排程」裡（Weatherboard 本機判讀）。
 
 ## build_board.py 的三種執行模式
 
-```bash
-pip install requests pillow
+舊版六地看板（`index.html`）的產生程式，目前排程不會跑它；`fetch_v2.py` 共用它的抓取層。
 
-python build_board.py --fetch-only              # 只抓，寫 history/<stamp>.json（Actions 用）
+```bash
+python build_board.py --fetch-only              # 只抓，寫 history/<stamp>.json
 python build_board.py --from-raw history/X.json # 只判讀，不重抓，產生 data.json / index.html
 python build_board.py                           # 抓＋判讀一次做完（本機手動跑用）
 ```
@@ -174,17 +193,6 @@ python build_board.py                           # 抓＋判讀一次做完（本
 `--fetch-only` 在所有來源都失敗時回非 0 並且不寫快照，不會產生空檔。
 `--from-raw` 不會再寫一筆 history，因為快照已經存在。
 前兩種以外的模式需要連得到 `www.cwa.gov.tw`、`www.yr.no`、`www.meteoblue.com`。
-
-## 已知限制：資料粒度
-
-Claude session 的網路出口是白名單制，對 `www.cwa.gov.tw`、`api.met.no`、
-`www.meteoblue.com` 一律回 403，直接抓官方端點行不通。網頁搜尋不受此限，
-所以收集改走搜尋——代價是**粒度只到日尺度**，拿不到逐時 PoP、QPF、雨量站這些資料。
-
-`report.html` 對取不到的欄位一律標「未取得」，不以鄰區數值或內插填補。
-
-要恢復逐時解析度有兩條路：放寬上述白名單後 Claude 就能直接抓；
-或到 Actions 手動跑一次 `fetch.yml`，它在 runner 上執行、網路不受限。
 
 ## 資料來源
 

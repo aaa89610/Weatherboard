@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+.venv/
+
+# 氣象資料只存在本機，不推上 GitHub（2026-10-01 起）
+data/
+history/

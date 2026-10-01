@@ -1,7 +1,8 @@
 name: 部署看板
 
-# GitHub 只負責部署：抓取、分析、判讀都在 Claude session 內完成後 push，
-# 這裡收到 push 就把當前內容發布到 GitHub Pages。排程不在這裡，在 Claude 端。
+# GitHub 只負責部署：抓取、分析、判讀都在本機（Claude 本機排程）完成後 push，
+# 這裡收到 push 就把當前內容發布到 GitHub Pages。排程不在這裡，在本機。
+# 氣象資料（data/、history/）只存在本機，不在 repo 裡，也不會被發布。
 on:
   push:
     branches: [main]
