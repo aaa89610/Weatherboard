@@ -8,7 +8,7 @@
 
 prepare  git pull → fetch_v2.py 抓取 → load.py --check
          結束碼 0：有新快照，要判讀；1：沒有新資料，跳過；2：pull 或抓取失敗
-digest   印出 load.py 的跨時間摘要（UTF-8，Windows 主控台不會亂碼）
+digest   印出 load.py 的跨時間摘要，並附上前 3 輪判讀紀錄（UTF-8，Windows 主控台不會亂碼）
 publish  render.py → 本機 commit report.json / report.html → push 到 GitHub（觸發 Pages 部署）
          結束碼 0：完成或沒有變更；2：render 或 commit 失敗；
          3：push 失敗（commit 留在本機，下次一起推）
@@ -49,7 +49,13 @@ def prepare():
 
 
 def digest():
-    return run([PY, os.path.join('analyze', 'load.py')])
+    rc = run([PY, os.path.join('analyze', 'load.py')])
+    # 前幾輪的判讀紀錄（判準、待辦）在 commit 訊息裡，一併印出，
+    # 排程就不必自己 cd 進來跑 git——那會觸發每次都要人工確認的安全詢問
+    print('\n── 前 3 輪判讀紀錄（git log）──', flush=True)
+    git('--no-pager', 'log', '-3', '--format=%n=== %h %ad%n%B', '--date=format:%Y-%m-%d %H:%M',
+        '--grep=^判讀 [0-9]')
+    return rc
 
 
 def publish(message, message_file):
