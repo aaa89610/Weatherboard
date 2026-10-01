@@ -1,0 +1,38 @@
+name: 部署看板
+
+# GitHub 只負責部署：抓取、分析、判讀都在本機（Claude 本機排程）完成後 push，
+# 這裡收到 push 就把當前內容發布到 GitHub Pages。排程不在這裡，在本機。
+# 氣象資料（data/、history/）只存在本機，不在 repo 裡，也不會被發布。
+on:
+  push:
+    branches: [main]
+    # 只有看板本身變動才部署；data/ 底下的原始快照不需要重新發布
+    paths: ['report.html', 'index.html', 'data.json', 'template.html', '.nojekyll']
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 打包網站
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

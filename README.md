@@ -2,36 +2,40 @@
 
 自動更新的降雨看板：台北市、新北市板橋／中和／土城、新竹市、新竹縣竹北市。
 
-報告：用瀏覽器開本機的 `report.html`。
+網頁：<https://aaa89610.github.io/Weatherboard/report.html>（本機也可直接開 `report.html`）
 
 ## 架構
 
-全部在**本機**：抓取、空間分析、判讀、產生報告、存檔，由 Claude 桌面版的本機排程執行。
-不連 GitHub —— 不 pull、不 push，repo 也沒有設定遠端。
+抓取、空間分析、判讀、產生報告都在**本機**完成，由 Claude 桌面版的本機排程執行；
+GitHub 只負責把報告發布成網頁。原始資料（`data/`、`history/`）**只存在本機**，不推上 GitHub。
 
 ```
 Claude 桌面版本機排程「Weatherboard 本機判讀」（每日 07:00、11:00、16:00、21:00）
   → analyze/local_update.py prepare
-       fetch_v2.py 抓 47 站與預報、跑空間分析、寫 data/v2/<stamp>.json
+       git pull → fetch_v2.py 抓 47 站與預報、跑空間分析、寫 data/v2/<stamp>.json
        → load.py --check（沒有新快照就結束）
   → analyze/local_update.py digest   讀 data/ 全部內容，跨時間比對
   → 判讀（模型做，不寫成閾值）→ 改寫 report.json
-  → analyze/local_update.py publish  render.py → report.html → 本機 git commit
+  → analyze/local_update.py publish  render.py → commit report.json / report.html → push
+       ↓
+GitHub Actions  deploy.yml
+  → 發布到 GitHub Pages
 ```
 
 存檔方式：
 
 | 內容 | 存在哪裡 |
 | --- | --- |
-| 原始快照 | `data/v2/<stamp>.json`，直接存在磁碟（`.gitignore` 排除，不進 git） |
-| 每一版報告 | `report.json` / `report.html` 的本機 git 歷史 |
+| 原始快照 | `data/v2/<stamp>.json`，只存在本機磁碟（`.gitignore` 排除） |
+| 每一版報告 | `report.json` / `report.html` 的 git 歷史（本機與 GitHub 都有） |
 | 判讀紀錄（判準、守門判定、待辦） | 每次 commit 的訊息；下一輪用 `git log` 讀回來延續 |
 
 排程只在 Claude 桌面版開著時執行；到點時電腦關機或 App 沒開，會在下次開啟時補跑一次。
+push 失敗（例如 GitHub 憑證過期）時 commit 會留在本機，下一次 publish 會一起補推。
 
 沿革：2026-09-21 之前抓取跑在 GitHub Actions 上（實測 6 天只跑 20 次，設定為 48 次）；
-09-21 起改由雲端 Claude Routine 抓取＋判讀、GitHub Pages 發布；
-2026-10-01 起整套搬到本機，不再使用 GitHub。原本的 GitHub Pages 網頁停在 09/29 11:02 那一版。
+09-21 起改由雲端 Claude Routine 抓取＋判讀；2026-10-01 起抓取與判讀搬到本機，
+GitHub 只留部署，雲端 Routine 已停用。
 
 ## 目錄
 
@@ -45,7 +49,7 @@ Claude 桌面版本機排程「Weatherboard 本機判讀」（每日 07:00、11:
 | `analyze/load.py` | 讀 `data/` 全部內容，輸出跨時間摘要 |
 | `analyze/render.py` | `report.json` → `report.html` |
 | `report.json` | 本次判讀結果 |
-| `report.html` | 報告本體，用瀏覽器開 |
+| `report.html` | 部署到 Pages 的報告（本機也可直接開） |
 | `rain-system-20260915/` | 前一代系統完整備份，含 `UPDATE_PROCEDURE.md` |
 
 ## 快照的 parser 版本
@@ -167,6 +171,8 @@ API 路徑另外會排除氣象署的缺測哨兵（負值如 -998），不與�
 
 ## 首次設定
 
+GitHub：Settings → Pages → Source 選 **GitHub Actions**（不是 Deploy from a branch）。
+
 本機（Windows）：
 
 ```powershell
@@ -174,7 +180,10 @@ API 路徑另外會排除氣象署的缺測哨兵（負值如 -998），不與�
 uv venv .venv --python 3.12
 uv pip install --python .venv\Scripts\python.exe requests pillow tzdata   # tzdata：Windows 的 zoneinfo 需要
 
-# 2. 手動跑一次確認
+# 2. GitHub 登入（只需一次）：手動 push 一次，跳出的視窗用 repo 擁有者帳號（aaa89610）登入
+git push origin main
+
+# 3. 手動跑一次確認
 .venv\Scripts\python.exe analyze\local_update.py prepare
 ```
 

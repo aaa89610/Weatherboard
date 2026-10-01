@@ -218,7 +218,7 @@ a:hover{border-bottom-color:var(--cyan)}
 <tr><td>10/08 四</td><td>20 – 27</td><td>19 – 27</td><td>21 – 28</td><td class="g">新進表</td></tr>
 </tbody></table></div>
 <h2>資料來源與方法</h2><div class="note">
-抓取、分析、判讀、產生報告<b>都在本機完成</b>（本機抓取、Claude 判讀），報告與資料都存在本機。<ul>
+抓取、分析、判讀、產生報告<b>都在本機完成</b>（本機抓取、Claude 判讀），GitHub 只負責發布網頁；原始資料只存在本機。<ul>
 <li><b>數值語意</b>：卡片上的 mm 是<b>本日累積雨量</b>，不是瞬時或時雨量；今日的值累積到 09:47–09:57 之間，午夜歸零。</li>
 <li><b>本輪 47 / 47 站取得</b>。環域半徑 9 km；「0 / N」代表 N 站都確認無雨。</li>
 <li><b>觀測時刻是區間</b>：本輪資料取自氣象署雨量網頁，該頁不附觀測時刻、每 10 分鐘更新，抓取在 09:57，所以實際觀測落在 09:47 到 09:57 之間。</li>
@@ -228,4 +228,4 @@ a:hover{border-bottom-color:var(--cyan)}
 <li>缺漏一律標「未取得」，不以鄰區數值代填、不內插、不編造。</li>
 <li><b>氣溫來源</b>：yr.no 逐日最低／最高溫，四捨五入到整數；新北四區以板橋為代表（四地高溫差異本表最大 0.7°C）。今日高溫另列氣象署逐時預報。氣溫與雨量皆為預報值，非實測。</li>
 </ul></div>
-<footer>資料收集 本機 · 判讀 by Claude ｜ 本機產生<br>來源：中央氣象署（雨量站網頁、鄉鎮逐時預報、特報）、yr.no（MET Norway／ECMWF）</footer></div></body></html>
+<footer>資料收集 本機 · 判讀 by Claude ｜ 部署 by GitHub Pages<br>來源：中央氣象署（雨量站網頁、鄉鎮逐時預報、特報）、yr.no（MET Norway／ECMWF）</footer></div></body></html>
