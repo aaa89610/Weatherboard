@@ -5,3 +5,6 @@ __pycache__/
 # 氣象資料只存在本機，不推上 GitHub（2026-10-01 起）
 data/
 history/
+
+# 本機交接說明（含本機路徑與帳號資訊，不公開）
+HANDOVER.md
