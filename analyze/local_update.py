@@ -2,14 +2,13 @@
 """本機更新的固定步驟。判讀（改寫 report.json）夾在 prepare 與 publish 之間，
 由 Claude 本機排程負責；這支只做不需要判斷的部分。
 
-    .venv\\Scripts\\python.exe analyze\\local_update.py prepare
-    .venv\\Scripts\\python.exe analyze\\local_update.py digest
-    .venv\\Scripts\\python.exe analyze\\local_update.py check
-    .venv\\Scripts\\python.exe analyze\\local_update.py publish -F <commit 訊息檔>
+    C:/repos/Weatherboard/.venv/Scripts/python.exe C:/repos/Weatherboard/analyze/local_update.py prepare
+    （digest、check、publish -F <commit 訊息檔> 同樣寫法；不必先 cd，最後一行會印出結束碼）
 
 prepare  git pull → fetch_v2.py 抓取 → load.py --check
          結束碼 0：有新快照，要判讀；1：沒有新資料，跳過；2：pull 或抓取失敗
-digest   印出 load.py 的跨時間摘要，並附上前 3 輪判讀紀錄（UTF-8，Windows 主控台不會亂碼）
+digest   load.py 的跨時間摘要，附上前 3 輪判讀紀錄，寫進 %USERPROFILE%/AppData/Local/Temp/weatherboard_digest.txt
+         （UTF-8；全文約 50 KB，超過 Bash 工具的輸出上限，所以不直接印出）
 check    查核 report.json：兩張表逐格對照最新快照、星期、判讀條數、HTML 實體、render 結果
          結束碼 0：通過；1：有錯誤（逐項列出）
 publish  render.py → 本機 commit report.json / report.html → push 到 GitHub（觸發 Pages 部署）
@@ -25,6 +24,9 @@ import argparse, os, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 SITE = ['report.json', 'report.html']
+# digest 全文約 50 KB，超過 Bash 工具的輸出上限；寫到固定檔案讓排程用 Read 工具讀。
+# 路徑用完整使用者名稱（TEMP 是 8.3 短名），才對得上 settings.json 的 Read 允許規則
+DIGEST = os.path.join(os.path.expanduser('~'), 'AppData', 'Local', 'Temp', 'weatherboard_digest.txt')
 BOT = ['-c', 'user.name=Weatherboard Bot', '-c', 'user.email=aaa89610@users.noreply.github.com']
 
 # 子程序一律 UTF-8；git 憑證缺失時立刻失敗，不要在排程裡卡在登入視窗
@@ -52,12 +54,19 @@ def prepare():
 
 
 def digest():
-    rc = run([PY, os.path.join('analyze', 'load.py')])
-    # 前幾輪的判讀紀錄（判準、待辦）在 commit 訊息裡，一併印出，
-    # 排程就不必自己 cd 進來跑 git——那會觸發每次都要人工確認的安全詢問
-    print('\n── 前 3 輪判讀紀錄（git log）──', flush=True)
-    git('--no-pager', 'log', '-3', '--format=%n=== %h %ad%n%B', '--date=format:%Y-%m-%d %H:%M',
-        '--grep=^判讀 [0-9]')
+    with open(DIGEST, 'w', encoding='utf-8') as f:
+        rc = subprocess.run([PY, os.path.join('analyze', 'load.py')], cwd=ROOT, env=ENV,
+                            stdout=f, stderr=subprocess.STDOUT).returncode
+        # 前幾輪的判讀紀錄（判準、待辦）在 commit 訊息裡，一併附上，
+        # 排程就不必自己 cd 進來跑 git——那會觸發每次都要人工確認的安全詢問
+        f.write('\n── 前 3 輪判讀紀錄（git log）──\n')
+        f.flush()
+        subprocess.run(['git', '--no-pager', 'log', '-3', '--format=%n=== %h %ad%n%B',
+                        '--date=format:%Y-%m-%d %H:%M', '--grep=^判讀 [0-9]'],
+                       cwd=ROOT, env=ENV, stdout=f, stderr=subprocess.STDOUT)
+    n = sum(1 for _ in open(DIGEST, encoding='utf-8'))
+    print(f"摘要 {n} 行已寫入 {DIGEST.replace(os.sep, '/')}\n"
+          '用 Read 工具讀全文（一次讀不完就用 offset / limit 分段），不要用 cat、grep、wc。')
     return rc
 
 
@@ -207,10 +216,15 @@ if __name__ == '__main__':
     g.add_argument('-m', dest='message')
     g.add_argument('-F', dest='message_file')
     a = ap.parse_args()
-    if a.cmd == 'prepare':
-        sys.exit(prepare())
-    if a.cmd == 'digest':
-        sys.exit(digest())
-    if a.cmd == 'check':
-        sys.exit(check())
-    sys.exit(publish(a.message, a.message_file))
+    rc = {'prepare': prepare, 'digest': digest, 'check': check,
+          'publish': lambda: publish(a.message, a.message_file)}[a.cmd]()
+    # 結束碼直接印在最後一行：排程不必在指令後面接 `; echo $?`——
+    # 含 $? 的指令每次都會跳出只能「Allow once」的詢問，無人值守時就卡住
+    meaning = {
+        'prepare': {0: '有新快照，繼續判讀', 1: '沒有新資料，本次跳過', 2: 'pull 或抓取失敗，本次不更新'},
+        'digest': {0: '完成'},
+        'check': {0: '查核通過', 1: '查核未通過，改完再跑一次'},
+        'publish': {0: '完成', 2: 'render 或 commit 失敗', 3: 'push 失敗，commit 留在本機'},
+    }[a.cmd]
+    print(f"── {a.cmd} 結束碼 {rc}：{meaning.get(rc, '非預期的結束碼，回報後結束')}", flush=True)
+    sys.exit(rc)
