@@ -95,96 +95,101 @@ a:hover{border-bottom-color:var(--cyan)}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <header><p class="eyebrow">Weatherboard · 空間判讀</p>
-<h1>北部七地雨情判讀</h1><p class="sub"><b>今天（週一）午夜到 07:00 只有新莊站 0.5 mm</b>，07:00 各站都沒在下，雨還沒正式開始。氣象署今天白天<b>新北四地短暫陣雨 80–90%、台北 50–70%</b>，傍晚 18–20 時仍有 30–70%；yr 台北從 25.0 降到 <b>14.8 mm</b>，板橋中和 15.6、土城樹林 14.7，沒有一地超過 30。<b>北北五地今天出門帶傘、下班也用得到，不必改行程；新竹竹北帶折傘就夠。</b></p><div class="meta">
-<span class="chip">觀測時刻 <b>2026-10-05 07:00</b></span>
-<span class="chip">測站 <b>47 / 47 · 氣象署 API</b></span>
-<span class="chip">有雨地區 <b>4 / 7（局部）</b></span>
+<h1>北部七地雨情判讀</h1><p class="sub"><b>今天（週一）上午北北五地真的下了</b>：到 11:00 台北信義站累積 12.0 mm、環域最大 <b>39.0 mm（福德）</b>，前 1 小時臺北站 17.5 mm，北北五地環域幾乎每站都有雨。大雨特報涵蓋大臺北到今晚。氣象署下午新北四地仍 70–90%、台北 30–50%。<b>北北五地帶大傘、避開低窪與溪邊，戶外行程能挪就挪到傍晚以後；新竹竹北到 11:00 全乾，帶折傘就夠。</b></p><div class="meta">
+<span class="chip">觀測時刻 <b>2026-10-05 11:00</b></span>
+<span class="chip">測站 <b>46 / 47 · 氣象署 API</b></span>
+<span class="chip">有雨地區 <b>5 / 7</b></span>
 <span class="chip">抓取 <b>本機</b></span>
 <span class="chip">判讀 <b>Claude</b></span>
 </div></header>
+<div class="alert amber"><span class="tag">大雨特報</span><h3>今天大臺北局部大雨（09:00 發布）</h3><p>對流雲系發展旺盛，易有短延時強降雨，今（5）日基隆北海岸、大臺北有局部大雨發生的機率；注意雷擊及強陣風，低窪地區慎防積水，山區慎防坍方、落石及溪水暴漲。有效到 10/06 00:00。</p></div>
 <h2>各地實測（環域，非單站）</h2><div class="grid">
-<div class="card" style="--rk:var(--green)">
+<div class="card" style="--rk:var(--red)">
 <h3>台北市</h3><div class="where">TAIPEI · 信義</div>
-<div class="pop">0.0 mm</div><dl>
-<dt>代表站</dt><dd>0.0 mm</dd>
-<dt>環域最大</dt><dd>0.0 mm</dd>
-<dt>有雨站</dt><dd>0 / 12</dd>
+<div class="pop">12.0 mm</div><dl>
+<dt>代表站</dt><dd>12.0 mm</dd>
+<dt>環域最大</dt><dd>39.0 mm</dd>
+<dt>有雨站</dt><dd>12 / 12</dd>
 </dl>
-<div class="src">環域 12 站全部確認無雨</div>
+<div class="src warn">環域 12 站全部有雨，最大福德 39.0 mm</div>
 </div>
 <div class="card" style="--rk:var(--amber)">
 <h3>板橋區</h3><div class="where">NEW TAIPEI</div>
-<div class="pop">0.5 mm</div><dl>
-<dt>代表站</dt><dd>0.0 mm</dd>
-<dt>環域最大</dt><dd>0.5 mm</dd>
-<dt>有雨站</dt><dd>1 / 12</dd>
+<div class="pop">8.0 mm</div><dl>
+<dt>代表站</dt><dd>8.0 mm</dd>
+<dt>環域最大</dt><dd>23.0 mm</dd>
+<dt>有雨站</dt><dd>12 / 12</dd>
 </dl>
-<div class="src warn">局部有雨：代表站 0，新莊站 0.5 mm</div>
+<div class="src warn">環域 12 站全部有雨，最大臺北站 23.0 mm</div>
 </div>
 <div class="card" style="--rk:var(--amber)">
 <h3>中和區</h3><div class="where">NEW TAIPEI</div>
-<div class="pop">0.5 mm</div><dl>
-<dt>代表站</dt><dd>0.0 mm</dd>
-<dt>環域最大</dt><dd>0.5 mm</dd>
-<dt>有雨站</dt><dd>1 / 14</dd>
+<div class="pop">6.5 mm</div><dl>
+<dt>代表站</dt><dd>6.5 mm</dd>
+<dt>環域最大</dt><dd>24.5 mm</dd>
+<dt>有雨站</dt><dd>14 / 14</dd>
 </dl>
-<div class="src warn">局部有雨：代表站 0，新莊站 0.5 mm</div>
+<div class="src warn">環域 14 站全部有雨，最大建國站 24.5 mm</div>
 </div>
 <div class="card" style="--rk:var(--amber)">
 <h3>土城區</h3><div class="where">NEW TAIPEI</div>
-<div class="pop">0.5 mm</div><dl>
-<dt>代表站</dt><dd>0.0 mm</dd>
-<dt>環域最大</dt><dd>0.5 mm</dd>
-<dt>有雨站</dt><dd>1 / 8</dd>
+<div class="pop">2.5 mm</div><dl>
+<dt>代表站</dt><dd>2.5 mm</dd>
+<dt>環域最大</dt><dd>9.0 mm</dd>
+<dt>有雨站</dt><dd>8 / 8</dd>
 </dl>
-<div class="src warn">局部有雨：代表站 0，新莊站 0.5 mm</div>
+<div class="src">環域 8 站全部有雨，最大國三 S037K 9.0 mm</div>
 </div>
 <div class="card" style="--rk:var(--amber)">
 <h3>樹林區</h3><div class="where">NEW TAIPEI · 山佳</div>
-<div class="pop">0.5 mm</div><dl>
-<dt>代表站</dt><dd>0.0 mm</dd>
-<dt>環域最大</dt><dd>0.5 mm</dd>
-<dt>有雨站</dt><dd>1 / 8</dd>
+<div class="pop">2.5 mm</div><dl>
+<dt>代表站</dt><dd>2.5 mm</dd>
+<dt>環域最大</dt><dd>9.0 mm</dd>
+<dt>有雨站</dt><dd>6 / 8</dd>
 </dl>
-<div class="src warn">局部有雨：代表站 0，新莊站 0.5 mm</div>
+<div class="src">環域 8 站中 6 站有雨，最大國三 S037K 9.0 mm</div>
 </div>
 <div class="card" style="--rk:var(--green)">
 <h3>新竹市</h3><div class="where">HSINCHU CITY</div>
 <div class="pop">0.0 mm</div><dl>
 <dt>代表站</dt><dd>0.0 mm</dd>
 <dt>環域最大</dt><dd>0.0 mm</dd>
-<dt>有雨站</dt><dd>0 / 4</dd>
+<dt>有雨站</dt><dd>0 / 3</dd>
 </dl>
-<div class="src">環域 4 站全部確認無雨</div>
+<div class="src">環域 3 站全部確認無雨</div>
 </div>
 <div class="card" style="--rk:var(--green)">
 <h3>竹北市</h3><div class="where">HSINCHU COUNTY</div>
 <div class="pop">0.0 mm</div><dl>
 <dt>代表站</dt><dd>0.0 mm</dd>
 <dt>環域最大</dt><dd>0.0 mm</dd>
-<dt>有雨站</dt><dd>0 / 4</dd>
+<dt>有雨站</dt><dd>0 / 3</dd>
 </dl>
-<div class="src">環域 4 站全部確認無雨</div>
+<div class="src">環域 3 站全部確認無雨</div>
 </div>
 </div>
 <h2>判讀</h2>
-<div class="conflict"><h3>① 今天（週一）白天北北五地帶傘，雨主要在 09–17 時 <span class="verdict v-scale">今天帶傘</span></h3>
-<p class="call"><b>今天（10/05 週一）台北、板橋、中和、土城、樹林出門都帶傘，不必改行程。</b>到 07:00 只有新莊站 0.5 mm，但氣象署白天新北四地短暫陣雨 80–90%、台北上午 70%；yr 台北 14.8、板橋中和 15.6、土城樹林 14.7 mm。</p>
-<details class="more"><summary>詳細說明</summary><p>今天午夜到 07:00 本日累積：七地環域內只有<b>新莊站 0.5 mm</b>（落在板橋、中和、土城、樹林四地的環域內，四地代表站都是 0）；台北環域 12 站、新竹竹北各 4 站全部 0。07:00 這一刻 47 站前 1 小時都是 0，雨還沒正式開始。昨晚那版說台北、中和 03 時起有陣雨（40%），平地實際只有這一筆 0.5 mm。</p><p>氣象署逐時（07 時起，逐地核對）：<b>中和</b> 07–08 時 70%、09–11 時 90%、12–14 時 80%、15–17 時 70%；<b>土城</b> 07–08 時 70%、09–11 時 80%、12–17 時 90%；<b>板橋</b> 07–08 時 60%、09–17 時 80%；<b>樹林</b> 07–08 時 70%、09–17 時 80%；<b>台北</b> 07–08 時 60%、09–11 時 70%、12–14 時 50%、15 時以後 30%。和昨晚那版逐時同值。</p><p>yr 今天：台北 <b>14.8</b>、板橋中和 <b>15.6</b>、土城樹林 <b>14.7</b> mm。台北今天的軌跡：9.0 → 8.2 → 3.4 → 3.1 → 14.7 → 14.7（重複取得）→ 28.8 → 24.6 → 25.0 → 25.0 → <b>14.8</b>，這版降了 10 mm，但氣象署機率沒降，傘照帶；沒有任何一地到 30，不必改行程。</p></details>
+<div class="conflict"><h3>① 今天（週一）北北五地已下大雨，中午前後最需要防 <span class="verdict v-scale">帶大傘</span></h3>
+<p class="call"><b>今天（10/05 週一）台北、板橋、中和、土城、樹林帶大傘，避開低窪路段與溪邊，戶外行程能挪就挪到傍晚以後。</b>到 11:00 台北累積 12.0 mm、局部福德 39.0 mm，大雨特報涵蓋大臺北；新北四地雖然目前量較少（2.5–8.0 mm），下午氣象署仍 70–90%。</p>
+<details class="more"><summary>詳細說明</summary><p>到 11:00 本日累積（環域）：<b>台北</b>代表站信義 12.0、最大福德 39.0 mm（12/12 站有雨）；<b>板橋</b> 8.0、最大臺北站 23.0（12/12）；<b>中和</b> 6.5、最大建國站 24.5（14/14）；<b>土城</b> 2.5、最大 9.0（8/8）；<b>樹林</b>山佳 2.5、最大 9.0（6/8）。07:00 時七地環域只有新莊站 0.5 mm，雨幾乎全落在 07–11 時。</p><p>雨勢強度：11:00 前 1 小時福德 23.0、臺北站 17.5、鞍部 21.0 mm；前 10 分鐘臺北站 3.5、文山 5.0 mm，仍在下，但全區 10 分鐘雨量比前一刻明顯減弱。雨區緩慢往西南西，未來 1 小時仍罩在台北與板橋、中和、土城、樹林上空。</p><p>yr 今天剩餘時段（11 時以後）：台北 5.5、板橋中和 3.1、土城樹林 2.8 mm。加上已下的量，台北信義約 17 mm、雨最大的福德一帶已超過 30 mm。</p></details>
 </div>
-<div class="conflict"><h3>② 下班 18–20 時新北仍有陣雨，土城樹林最需要傘 <span class="verdict v-scale">下班帶傘</span></h3>
-<p class="call"><b>傘留在身上到下班，土城、樹林通勤最需要。</b>18–20 時土城樹林短暫陣雨 70%、板橋中和 50%、台北 30%；21 時以後五地降到 30%，午夜轉陰。</p>
-<details class="more"><summary>詳細說明</summary><p>氣象署 18–20 時：<b>土城、樹林 70%</b>，板橋、中和 50%，台北 30%，全是短暫陣雨。21–23 時北北五地降到 30%，午夜以後轉陰、10–20%。</p><p>21:00 以後到明早 07:00 沒有觀測覆蓋，夜裡有沒有下雨要等明早那一版才知道。</p></details>
+<div class="conflict"><h3>② 下午到下班新北四地陣雨機率仍高，土城樹林撐最久 <span class="verdict v-scale">下班帶傘</span></h3>
+<p class="call"><b>傘留在身上到下班，土城、樹林、中和最需要。</b>18–20 時土城樹林短暫陣雨 70%、板橋中和 50%、台北 30%；中和土城樹林到明天凌晨 02 時都還有 30%。</p>
+<details class="more"><summary>詳細說明</summary><p>氣象署逐時（逐地）：<b>土城</b> 11 時 80%、12–17 時 90%、18–20 時 70%；<b>樹林</b> 11–17 時 80%、18–20 時 70%；<b>中和</b> 11 時 90%、12–14 時 80%、15–17 時 70%、18–20 時 50%；<b>板橋</b> 11–17 時 80%、18–20 時 50%；<b>台北</b> 11 時 70%、12–14 時 50%、15–23 時 30%，全為短暫陣雨。</p><p>入夜：新北四地 21–23 時 30%；中和、土城、樹林 10/06 00–02 時仍有短暫陣雨 30%（07:00 那版是午夜轉陰），03 時以後轉陰 20%；台北、板橋午夜起陰 10–20%。</p><p>21:00 以後到明早 07:00 沒有觀測覆蓋，夜裡實際下了多少要等明早那一版。</p></details>
 </div>
-<div class="conflict"><h3>③ 新竹竹北上午有陣雨機率，但雨量很小 <span class="verdict v-ok">帶折傘</span></h3>
-<p class="call"><b>新竹竹北帶把折傘就夠，不用為雨改安排。</b>上午短暫陣雨機率新竹 40%、竹北 50%，下午降到 30%；yr 全天只有 1.2 mm。</p>
-<details class="more"><summary>詳細說明</summary><p>氣象署逐時：<b>新竹</b> 07–11 時短暫陣雨 40%、12–17 時 30%；<b>竹北</b> 07–11 時 50%、12–14 時 40%、15–17 時 30%；兩地 18 時起轉陰 20%，明天凌晨 0%。</p><p>yr 新竹竹北今天 1.2 mm（昨晚那版 1.8），到 07:00 兩地環域各 4 站全部 0。</p></details>
+<div class="conflict"><h3>③ 新竹竹北到 11:00 全乾，帶折傘就夠 <span class="verdict v-ok">帶折傘</span></h3>
+<p class="call"><b>新竹竹北帶把折傘就夠，不用為雨改安排。</b>到 11:00 兩地全乾，下午短暫陣雨機率新竹 20–30%、竹北 30–40%；yr 剩餘只有 0.9 mm。</p>
+<details class="more"><summary>詳細說明</summary><p>到 11:00 兩地環域各 3 站全部 0（北北下大雨時新竹竹北一滴未落）。yr 今天剩餘 0.9 mm。</p><p>氣象署逐時：<b>新竹</b> 11 時短暫陣雨 40%、12–14 時多雲 20%、15–20 時短暫陣雨 30%、21 時起陰 20%；<b>竹北</b> 11 時 50%、12–14 時 40%、15–23 時 30%；兩地 10/06 凌晨起 0%、明天上午轉晴。</p></details>
 </div>
-<div class="conflict"><h3>④ 今天 29–30°C，週二最涼；新竹整週比台北熱 <span class="verdict v-scale">不用外套</span></h3>
-<p class="call"><b>今天下雨但悶，白天 29–30°C，週二最涼（台北高溫 25°C），早晚 20–24°C，不用帶外套。</b>平常新竹比北北低 2–3°C，這週倒過來：新竹竹北每天比台北高 1–3°C，下週一新竹到 33°C。</p>
-<details class="more"><summary>詳細說明</summary><p>氣象署逐時：今天 07 時七地 24–25°C，中午台北 28、新北 27、新竹竹北 28°C；傍晚 18–20 時回到 24–26°C。</p><p>yr 逐日高溫（台北）：10/05 <b>29</b>、<b>10/06 25</b>、10/07 26、10/08 28、10/09 28、10/10 29、10/11 29、10/12 30°C；新北四區今天 30、下週一 31；早晚 20–24°C。和昨晚那版比：今天台北 28 → 29、新北 29 → 30、新竹 29 → 30，其餘高溫不變。</p><p>新竹竹北與台北的高溫差：<b>今天 +1</b>、週二到週四 +2、<b>週五 +3</b>、週六週日 +1、<b>下週一 +3</b>（新竹 33°C）。平常新竹比北北低 2–3°C，這一整週是倒過來的。</p></details>
+<div class="conflict"><h3>④ 週二起轉乾，北北週二不必帶傘 <span class="verdict v-ok">不用帶傘</span></h3>
+<p class="call"><b>週二（10/06）到週四北北都不必帶傘，台北怕萬一帶折傘即可。</b>yr 週二台北 2.0 mm、新北 0.3–0.5 mm，週三週四近 0；氣象署週二上午只有 10–20%。</p>
+<details class="more"><summary>詳細說明</summary><p>yr 10/06（週二）：台北 2.0、板橋中和 0.5、土城樹林 0.3、新竹竹北 0.1 mm；10/07 台北 0.6，其餘 0–0.1；10/08–10/09 七地全 0。</p><p>氣象署 10/06 清晨到上午：台北陰 10%、新北四地陰 20%、新竹竹北 0%（09 時起晴）。</p></details>
 </div>
-<h2>未來 9 天（yr.no 日雨量 mm · 10/05 07:11 取得）</h2><div class="scroll"><table><thead><tr>
+<div class="conflict"><h3>⑤ 今天雨中 28–30°C，週二最涼；新竹週四到下週一比台北高 2–3°C <span class="verdict v-scale">不用外套</span></h3>
+<p class="call"><b>今天下雨但悶，白天 28–30°C，週二最涼（台北高溫 25°C），早晚 20–23°C，不用帶外套。</b>平常新竹比北北低 2–3°C，這週倒過來：週四到週六新竹竹北比台北高 3°C，週六與下週一新竹到 32°C。</p>
+<details class="more"><summary>詳細說明</summary><p>氣象署逐時：今天中午台北 28、新北 27、新竹竹北 29°C；傍晚 18–20 時 24–26°C，明天清晨 23–24°C。</p><p>yr 逐日高溫（台北）：10/05 <b>28</b>、<b>10/06 25</b>、10/07 26、10/08 27、10/09 27、10/10 29、10/11 28、10/12 30°C；新北四區 30 / 25 / 26 / 28 / 28 / 30 / 29 / 30；早晚 20–23°C。和 07:00 那版比：台北今天 29 → 28、週四週五 28 → 27、下週一低溫 24 → 22。</p><p>新竹竹北與台北的高溫差：今天 +1、週二週三 +2、<b>週四到週六 +3</b>、週日下週一 +2；和新北比今天新竹低 1°C，其餘新竹高 1–2°C。平常新竹比北北低 2–3°C，這週大致是倒過來的。</p></details>
+</div>
+<h2>未來 9 天（yr.no 日雨量 mm · 10/05 11:11 取得）</h2><div class="scroll"><table><thead><tr>
 <th>日期</th>
 <th>台北</th>
 <th>板橋 / 中和</th>
@@ -192,15 +197,15 @@ a:hover{border-bottom-color:var(--cyan)}
 <th>新竹 / 竹北</th>
 <th>備註</th>
 </tr></thead><tbody>
-<tr><td>10/05 一</td><td><b>14.8</b></td><td><b>15.6 / 15.6</b></td><td><b>14.7 / 14.7</b></td><td>1.2 / 1.2</td><td class="g"><b>台北 25.0 → 14.8；氣象署新北四地 80–90%，北北帶傘</b></td></tr>
-<tr><td>10/06 二</td><td>1.4</td><td>0.1 / 0.1</td><td>0.1 / 0.1</td><td>0 / 0</td><td class="g">幾乎全乾</td></tr>
-<tr><td>10/07 三</td><td>0.3</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">全乾</td></tr>
-<tr><td>10/08 四</td><td>0.2</td><td>0.1 / 0.1</td><td>0.1 / 0.1</td><td>0 / 0</td><td class="g">全乾；遠端只記錄</td></tr>
-<tr><td>10/09 五</td><td>2.3</td><td>1.4 / 1.4</td><td>0.8 / 0.8</td><td>0 / 0</td><td class="g">零星雨量；遠端只記錄</td></tr>
+<tr><td>10/05 一</td><td><b>5.5</b></td><td>3.1 / 3.1</td><td>2.8 / 2.8</td><td>0.9 / 0.9</td><td class="g"><b>只算 11 時以後；到 11:00 台北已下 12.0（局部 39.0），大雨特報</b></td></tr>
+<tr><td>10/06 二</td><td>2.0</td><td>0.5 / 0.5</td><td>0.3 / 0.3</td><td>0.1 / 0.1</td><td class="g">轉乾；北北不必帶傘</td></tr>
+<tr><td>10/07 三</td><td>0.6</td><td>0 / 0</td><td>0.1 / 0.1</td><td>0 / 0</td><td class="g">全乾</td></tr>
+<tr><td>10/08 四</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">全乾；遠端只記錄</td></tr>
+<tr><td>10/09 五</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">全乾；遠端只記錄</td></tr>
 <tr><td>10/10 六</td><td>0.4</td><td>0.1 / 0.1</td><td>0 / 0</td><td>0 / 0</td><td class="g">遠端只記錄</td></tr>
-<tr><td>10/11 日</td><td>2.2</td><td>3.0 / 3.0</td><td>3.7 / 3.7</td><td>0.2 / 0.2</td><td class="g">遠端只記錄</td></tr>
-<tr><td>10/12 一</td><td>0.4</td><td>0.1 / 0.1</td><td>0 / 0</td><td>0 / 0</td><td class="g">遠端只記錄</td></tr>
-<tr><td>10/13 二</td><td>0.2</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">遠端只記錄</td></tr>
+<tr><td>10/11 日</td><td>0.7</td><td>0.2 / 0.2</td><td>0.9 / 0.9</td><td>0 / 0</td><td class="g">遠端只記錄</td></tr>
+<tr><td>10/12 一</td><td>0</td><td>0 / 0</td><td>0 / 0</td><td>0 / 0</td><td class="g">遠端只記錄</td></tr>
+<tr><td>10/13 二</td><td>1.3</td><td>0.6 / 0.6</td><td>0.8 / 0.8</td><td>0 / 0</td><td class="g">遠端只記錄</td></tr>
 </tbody></table></div>
 <h2>未來 8 天氣溫（yr.no 逐日最低 – 最高 °C）</h2><div class="scroll"><table><thead><tr>
 <th>日期</th>
@@ -209,25 +214,25 @@ a:hover{border-bottom-color:var(--cyan)}
 <th>新竹 / 竹北</th>
 <th>備註</th>
 </tr></thead><tbody>
-<tr><td>10/05 一</td><td>23 – 29</td><td>23 – 30</td><td>23 – 30</td><td class="g">北北有雨；新竹比台北高 1°C、與新北同</td></tr>
+<tr><td>10/05 一</td><td>23 – 28</td><td>23 – 30</td><td>23 – 29</td><td class="g">北北下雨；新竹比台北高 1°C、比新北低 1°C</td></tr>
 <tr><td>10/06 二</td><td>22 – <b>25</b></td><td>22 – 25</td><td>23 – 27</td><td class="g"><b>本週最涼的白天</b>；新竹比台北高 2°C</td></tr>
-<tr><td>10/07 三</td><td>22 – 26</td><td>21 – 26</td><td>23 – 28</td><td class="g">新竹比台北高 2°C</td></tr>
-<tr><td>10/08 四</td><td>21 – 28</td><td>20 – 29</td><td>22 – 30</td><td class="g">新竹比台北高 2°C</td></tr>
-<tr><td>10/09 五</td><td>20 – 28</td><td>20 – 29</td><td>22 – 31</td><td class="g"><b>新竹比台北高 3°C</b>；本週最低溫 20°C</td></tr>
-<tr><td>10/10 六</td><td>23 – 29</td><td>23 – 29</td><td>24 – 30</td><td class="g">台北回暖；新竹比台北高 1°C</td></tr>
-<tr><td>10/11 日</td><td>22 – 29</td><td>22 – 29</td><td>23 – 30</td><td class="g">新竹比台北高 1°C</td></tr>
-<tr><td>10/12 一</td><td>24 – 30</td><td>24 – 31</td><td>22 – <b>33</b></td><td class="g"><b>新竹 33°C、比台北高 3°C</b></td></tr>
+<tr><td>10/07 三</td><td>22 – 26</td><td>22 – 26</td><td>22 – 28</td><td class="g">新竹比台北高 2°C</td></tr>
+<tr><td>10/08 四</td><td>21 – 27</td><td>21 – 28</td><td>22 – 30</td><td class="g"><b>新竹比台北高 3°C</b></td></tr>
+<tr><td>10/09 五</td><td>21 – 27</td><td>20 – 28</td><td>22 – 30</td><td class="g"><b>新竹比台北高 3°C</b>；新北低溫 20°C</td></tr>
+<tr><td>10/10 六</td><td>22 – 29</td><td>22 – 30</td><td>22 – <b>32</b></td><td class="g"><b>新竹 32°C、比台北高 3°C</b></td></tr>
+<tr><td>10/11 日</td><td>22 – 28</td><td>21 – 29</td><td>23 – 30</td><td class="g">新竹比台北高 2°C</td></tr>
+<tr><td>10/12 一</td><td>22 – 30</td><td>21 – 30</td><td>22 – <b>32</b></td><td class="g"><b>新竹 32°C</b>、比台北高 2°C</td></tr>
 </tbody></table></div>
 <h2>資料來源與方法</h2><div class="note">
 抓取、分析、判讀、產生報告<b>都在本機完成</b>（本機抓取、Claude 判讀），GitHub 只負責發布網頁；原始資料只存在本機。<ul>
-<li><b>數值語意</b>：卡片上的 mm 是<b>本日累積雨量</b>，不是瞬時或時雨量；今日的值從午夜累積到 07:00。</li>
-<li><b>本輪 47 / 47 站取得</b>，來自氣象署開放資料 API。環域半徑 9 km；「0 / N」代表 N 站都確認無雨。代表站 0 但環域內有站量到雨時，卡片改用環域值並標「局部有雨」。</li>
-<li><b>觀測時刻 07:00</b>，抓取 07:11。卡片與判讀一律以觀測時刻為準，不以抓取時刻代替。每天 21:00 到隔天 07:00 之間沒有觀測覆蓋，本頁不宣稱跨夜無雨。</li>
-<li><b>表格起算日</b>：早上抓取時 yr 的今天是完整日值，兩張表含今天（10/05）；yr 本輪提供到 10/13，雨量表 9 列、氣溫表 8 列。</li>
+<li><b>數值語意</b>：卡片上的 mm 是<b>本日累積雨量</b>，不是瞬時或時雨量；今日的值從午夜累積到 11:00。</li>
+<li><b>本輪 46 / 47 站取得</b>，來自氣象署開放資料 API；未取得的 1 站直接排除，不以 0 補。環域半徑 9 km；「0 / N」代表 N 站都確認無雨。代表站 0 但環域內有站量到雨時，卡片改用環域值並標「局部有雨」。</li>
+<li><b>觀測時刻 11:00</b>，抓取 11:11。卡片與判讀一律以觀測時刻為準，不以抓取時刻代替。每天 21:00 到隔天 07:00 之間沒有觀測覆蓋，本頁不宣稱跨夜無雨。</li>
+<li><b>表格起算日</b>：中午抓取時兩張表含今天（10/05）；但 yr 今天的雨量只涵蓋抓取之後的時段，已經下的量看上方實測卡片。yr 本輪提供到 10/13，雨量表 9 列、氣溫表 8 列。</li>
 <li><b>資料空檔</b>：09/29 11:02 之後到 10/01 09:32 之間沒有抓取（更新改到本機執行的過渡期），這段期間的實測<b>未取得</b>，09/30 有沒有下雨本頁無法回答。</li>
 <li><b>雨量計解析度 0.5 mm</b>，所以「站報 0」不等於完全沒有水氣；表上 1 mm 以下的預報值，實務上接近「測不到」。</li>
 <li><b>遠端日期的處理</b>：第 4 天以外的數字只記錄不採用，進到 3 天內才用固定的三段判準（挪行程／帶傘／不追蹤）下結論，時程事先寫定，不因單版數字大小調整。</li>
 <li>缺漏一律標「未取得」，不以鄰區數值代填、不內插、不編造。</li>
-<li><b>氣溫來源</b>：yr.no 逐日最低／最高溫，四捨五入到整數；新北四區以板橋為代表（四地差異本表最大 0.8°C）。氣溫與雨量皆為預報值，非實測。</li>
+<li><b>氣溫來源</b>：yr.no 逐日最低／最高溫，四捨五入到整數；新北四區以板橋為代表（四地差異本表最大 0.6°C）。氣溫與雨量皆為預報值，非實測。</li>
 </ul></div>
 <footer>資料收集 本機 · 判讀 by Claude ｜ 部署 by GitHub Pages<br>來源：中央氣象署開放資料 API（雨量站、鄉鎮逐時預報、特報）、yr.no（MET Norway／ECMWF）</footer></div></body></html>
