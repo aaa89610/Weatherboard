@@ -6,36 +6,42 @@
 
 ## 架構
 
-抓取、空間分析、判讀、產生報告都在**本機**完成，由 Claude 桌面版的本機排程執行；
-GitHub 只負責把報告發布成網頁。原始資料（`data/`、`history/`）**只存在本機**，不推上 GitHub。
+抓取、空間分析、判讀、產生報告由 **claude.ai 雲端排程任務**「Weatherboard 雲端判讀」完成，
+不需要開著自己的電腦；GitHub 只負責把報告發布成網頁。原始資料（`data/`、`history/`）不推上 GitHub。
 
 ```
-Claude 桌面版本機排程「Weatherboard 本機判讀」（每日 07:00、11:00、16:00、21:00）
-  → analyze/local_update.py prepare
-       git pull → fetch_v2.py 抓 47 站與預報、跑空間分析、寫 data/v2/<stamp>.json
-       → load.py --check（沒有新快照就結束）
-  → analyze/local_update.py digest   讀 data/ 全部內容，跨時間比對
-  → 判讀（模型做，不寫成閾值）→ 改寫 report.json
-  → analyze/local_update.py publish  render.py → commit report.json / report.html → push
+雲端排程任務（每日 07:00、11:00、16:00、21:00，每次全新 session，自動 clone 本 repo）
+  → 照 analyze/CLOUD_TASK.md 執行
+  → local_update.py prepare   抓 47 站與預報、跑空間分析（沒有新快照就結束）
+  → local_update.py digest    本次快照摘要 ＋ 前 3 輪判讀紀錄
+  → 判讀 → 改寫 report.json → local_update.py check
+  → local_update.py publish   render → commit → push 到 main
        ↓
-GitHub Actions  deploy.yml
-  → 發布到 GitHub Pages
+GitHub Actions  deploy.yml → GitHub Pages
 ```
 
 存檔方式：
 
 | 內容 | 存在哪裡 |
 | --- | --- |
-| 原始快照 | `data/v2/<stamp>.json`，只存在本機磁碟（`.gitignore` 排除） |
-| 每一版報告 | `report.json` / `report.html` 的 git 歷史（本機與 GitHub 都有） |
-| 判讀紀錄（判準、守門判定、待辦） | 每次 commit 的訊息；下一輪用 `git log` 讀回來延續 |
+| 原始快照 | 雲端：每輪只有當下那一筆，session 結束即消失；本機：`data/v2/`（`.gitignore` 排除） |
+| 每一版報告 | `report.json` / `report.html` 的 git 歷史 |
+| 判讀紀錄（判準、守門判定、待辦） | 每次 commit 的訊息；下一輪由 `digest` 讀回前 3 輪 |
 
-排程只在 Claude 桌面版開著時執行；到點時電腦關機或 App 沒開，會在下次開啟時補跑一次。
-push 失敗（例如 GitHub 憑證過期）時 commit 會留在本機，下一次 publish 會一起補推。
+雲端每輪是全新 session、手邊只有一筆快照，**commit 訊息是下一輪唯一的記憶**，
+所以「待辦」區塊要把下一輪要比對的數字寫完整。執行細節見 `analyze/CLOUD_TASK.md`。
 
-沿革：2026-09-21 之前抓取跑在 GitHub Actions 上（實測 6 天只跑 20 次，設定為 48 次）；
-09-21 起改由雲端 Claude Routine 抓取＋判讀；2026-10-01 起抓取與判讀搬到本機，
-GitHub 只留部署，雲端 Routine 已停用。
+`analyze/local_update.py` 在 Windows（本機）與 Linux（雲端）都能跑，本機排程可作為備援。
+兩邊**不要同時開**，否則同一時段會推兩份報告。
+
+沿革：
+
+| 期間 | 抓取 | 判讀 | 備註 |
+| --- | --- | --- | --- |
+| ~ 09-21 | GitHub Actions | 雲端 Routine | Actions 排程實測 6 天只跑 20 次（設定 48 次） |
+| 09-21 ~ 09-29 | 雲端 Routine | 雲端 Routine | 綁定常駐 session，對話越長每輪越貴，溢出到 usage credits |
+| 10-01 ~ 11-06 | 本機 | 本機 | Claude 桌面版本機排程，電腦要開著才會跑 |
+| 11-06 ~ | 雲端排程任務 | 雲端排程任務 | 每輪全新 session，成本固定；自動 clone repo 才能 push |
 
 ## 目錄
 
@@ -43,7 +49,8 @@ GitHub 只留部署，雲端 Routine 已停用。
 | --- | --- |
 | `data/v2/` | 固定 schema 快照，可跨時間比較（**僅本機**） |
 | `data/raw/` | 舊格式快照 22 筆（09/11–09/15），每筆 schema 不同，僅供淺層參考（**僅本機**） |
-| `analyze/local_update.py` | 本機更新的固定步驟：`prepare` / `digest` / `publish` |
+| `analyze/local_update.py` | 更新的固定步驟：`prepare` / `digest` / `check` / `publish`（Windows 與 Linux 皆可） |
+| `analyze/CLOUD_TASK.md` | 雲端排程任務每次執行的完整步驟 |
 | `analyze/fetch_v2.py` | 抓測站與預報、跑空間分析、寫 v2 快照 |
 | `spatial/` | 47 站表與空間分析模組（純函式：envelope／summarize／terrain_split／track） |
 | `analyze/load.py` | 讀 `data/` 全部內容，輸出跨時間摘要 |
