@@ -2,12 +2,14 @@
 """本機更新的固定步驟。判讀（改寫 report.json）夾在 prepare 與 publish 之間，
 由 Claude 本機排程負責；這支只做不需要判斷的部分。
 
-    C:/repos/Weatherboard/.venv/Scripts/python.exe C:/repos/Weatherboard/analyze/local_update.py prepare
+    本機（Windows）：C:/repos/Weatherboard/.venv/Scripts/python.exe C:/repos/Weatherboard/analyze/local_update.py prepare
+    雲端（Linux）  ：python3 analyze/local_update.py prepare
     （digest、check、publish -F <commit 訊息檔> 同樣寫法；不必先 cd，最後一行會印出結束碼）
 
 prepare  git pull → fetch_v2.py 抓取 → load.py --check
          結束碼 0：有新快照，要判讀；1：沒有新資料，跳過；2：pull 或抓取失敗
-digest   load.py 的跨時間摘要，附上前 3 輪判讀紀錄，寫進 %USERPROFILE%/AppData/Local/Temp/weatherboard_digest.txt
+digest   load.py 的跨時間摘要，附上前 3 輪判讀紀錄，寫進暫存目錄的 weatherboard_digest.txt
+         （Windows：%USERPROFILE%/AppData/Local/Temp/；Linux：/tmp/）
          （UTF-8；全文約 50 KB，超過 Bash 工具的輸出上限，所以不直接印出）
 check    查核 report.json：兩張表逐格對照最新快照、星期、判讀條數、HTML 實體、render 結果
          結束碼 0：通過；1：有錯誤（逐項列出）
@@ -19,14 +21,19 @@ publish  render.py → 本機 commit report.json / report.html → push 到 GitH
 下一輪判讀靠 `git log` 延續判準。data/ 與 history/ 只存在本機磁碟（.gitignore），不推上 GitHub。
 commit 一律用 Weatherboard Bot 的 noreply 身分，不帶出本機的 git 帳號與信箱。
 """
-import argparse, os, subprocess, sys
+import argparse, os, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 SITE = ['report.json', 'report.html']
 # digest 全文約 50 KB，超過 Bash 工具的輸出上限；寫到固定檔案讓排程用 Read 工具讀。
-# 路徑用完整使用者名稱（TEMP 是 8.3 短名），才對得上 settings.json 的 Read 允許規則
-DIGEST = os.path.join(os.path.expanduser('~'), 'AppData', 'Local', 'Temp', 'weatherboard_digest.txt')
+# Windows（本機排程）：路徑用完整使用者名稱（TEMP 是 8.3 短名），才對得上 settings.json 的
+# Read 允許規則，這條路徑不要改。其他系統（雲端排程跑在 Linux）：沒有 AppData，用系統暫存目錄。
+if os.name == 'nt':
+    TMPDIR = os.path.join(os.path.expanduser('~'), 'AppData', 'Local', 'Temp')
+else:
+    TMPDIR = tempfile.gettempdir()
+DIGEST = os.path.join(TMPDIR, 'weatherboard_digest.txt')
 BOT = ['-c', 'user.name=Weatherboard Bot', '-c', 'user.email=aaa89610@users.noreply.github.com']
 
 # 子程序一律 UTF-8；git 憑證缺失時立刻失敗，不要在排程裡卡在登入視窗
@@ -54,6 +61,7 @@ def prepare():
 
 
 def digest():
+    os.makedirs(TMPDIR, exist_ok=True)
     with open(DIGEST, 'w', encoding='utf-8') as f:
         rc = subprocess.run([PY, os.path.join('analyze', 'load.py')], cwd=ROOT, env=ENV,
                             stdout=f, stderr=subprocess.STDOUT).returncode
@@ -162,7 +170,7 @@ def check():
         warns.append(f'讀不到上一版報告，跳過舊時刻掃描（{type(e).__name__}）')
 
     html = render.render(rep)
-    preview = os.path.join(os.environ.get('TEMP', ROOT), 'weatherboard_preview.html')
+    preview = os.path.join(TMPDIR, 'weatherboard_preview.html')
     open(preview, 'w', encoding='utf-8').write(html)
     if html.count('<table') != 2:
         errs.append(f"render 後表格 {html.count('<table')} 張，應為 2 張")
