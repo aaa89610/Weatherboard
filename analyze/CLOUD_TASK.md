@@ -6,6 +6,12 @@
 **每次觸發都是全新 session，沒有上一輪的記憶。** 跨輪延續全部靠 git 歷史：
 報告存在 `report.json` 的歷史裡，判準、守門判定、待辦存在每次 commit 的訊息裡。
 
+## 前提（排程任務的設定）
+
+排程任務必須在 claude.ai 的設定裡**附上 repository `aaa89610/Weatherboard`**
+（編輯任務 → Advanced settings → Repository）。沒附上的話，session 自己 `git clone` 讀得到，
+但 push 會被 git proxy 擋（403），判讀做完也發布不了。
+
 ## 步驟
 
 1. 裝套件：

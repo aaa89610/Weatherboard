@@ -19,7 +19,7 @@ publish  render.py → 本機 commit report.json / report.html → push 到 GitH
 
 報告本機也看得到（report.html）；每一版報告與判讀紀錄（commit 訊息）都在 git 歷史裡，
 下一輪判讀靠 `git log` 延續判準。data/ 與 history/ 只存在本機磁碟（.gitignore），不推上 GitHub。
-commit 一律用 Weatherboard Bot 的 noreply 身分，不帶出本機的 git 帳號與信箱。
+commit 身分：本機用 Weatherboard Bot 的 noreply 身分；雲端排程沿用 session 的 Claude 身分。
 """
 import argparse, os, subprocess, sys, tempfile
 
@@ -34,7 +34,13 @@ if os.name == 'nt':
 else:
     TMPDIR = tempfile.gettempdir()
 DIGEST = os.path.join(TMPDIR, 'weatherboard_digest.txt')
-BOT = ['-c', 'user.name=Weatherboard Bot', '-c', 'user.email=aaa89610@users.noreply.github.com']
+# 本機：用 Weatherboard Bot 的 noreply 身分，不帶出本機的 git 帳號與信箱。
+# 雲端排程：沿用 session 已設好的 Claude 身分——雲端的 hook 要求 commit 作者是 Claude，
+# 用 Bot 身分會被要求改作者，推上 main 之後再改就得強推。
+if os.environ.get('CLAUDE_CODE_REMOTE'):
+    BOT = []
+else:
+    BOT = ['-c', 'user.name=Weatherboard Bot', '-c', 'user.email=aaa89610@users.noreply.github.com']
 
 # 子程序一律 UTF-8；git 憑證缺失時立刻失敗，不要在排程裡卡在登入視窗
 ENV = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8',
